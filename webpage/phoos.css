@@ -1,0 +1,36 @@
+body {
+    background-color: #252830;
+    color: white;
+}
+.logo {
+    width: 50px;
+    filter: invert(0);
+}
+.undernav {
+    margin-top:  100px;
+    padding-top: 100px;
+}
+#scores {
+    text-align: center;
+    color: white;
+}
+.input {
+    text-align: center;
+}
+.pad {
+    font-size: 130%;
+    padding: 10px 0 20px 0;
+}
+.boxed {
+    border-style: solid;
+    border-width: 1px;
+    border-color: cadetblue;
+    border-radius: 10px;
+}
+.form-fill {
+    width: 90%;
+    margin-top: 5px;
+}
+.marg-left {
+    margin-left: 5%;
+}
