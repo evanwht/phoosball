@@ -7,8 +7,8 @@ body {
     filter: invert(0);
 }
 .undernav {
-    margin-top:  80px;
-    padding-top: 80px;
+    margin-top:  60px;
+    padding-top: 60px;
 }
 #scores {
     text-align: center;
@@ -17,6 +17,9 @@ body {
 .centering {
   margin-left: auto;
   margin-right: auto;
+}
+hr {
+  background-color: grey;
 }
 .label {
     text-align: center;
