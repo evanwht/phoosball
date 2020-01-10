@@ -17,5 +17,5 @@ func main() {
     fs := http.FileServer(http.Dir("webpage/"))
 	  http.Handle("/", fs)
     http.HandleFunc("/headers", headers)
-    http.ListenAndServer(":3032", nil)
+    http.ListenAndServe(":3032", nil)
 }
