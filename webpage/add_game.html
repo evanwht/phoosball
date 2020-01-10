@@ -13,23 +13,30 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="index.html">Home</a>
                     </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Record</a>
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        New
+                      </a>
+                      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="add_player.html">Player</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="">Game</a>
+                      </div>
                     </li>
                 </ul>
             </div>
         </nav>
-        
+
         <div class="row">
             <div id="scores" class="container col-8 undernav">
-                <form>
-                    <div class="form-group boxed pad">
+                <form class="">
+                    <div class="form-group boxed">
                         <h3>Starting Positions</h3>
                         <div class="row pad">
                             <div class="col-2"></div>
@@ -37,21 +44,21 @@
                             <div class="col">Offense</div>
                         </div>
                         <div class="form-group row">
-                            <label class="col col-form-label-md col-form-label">Team 2</label>
-                            <div class="col-5">
-                                <input type="text" class="form-control form-fill" id="player1">
+                            <label class="col col-form-label-lg">Team 1</label>
+                            <div class="col-md-5">
+                                <input type="text" class="centering form-control form-fill" id="player1">
                             </div>
-                            <div class="col-5">
-                                <input type="text" class="form-control form-fill" id="player2">
+                            <div class="col-md-5">
+                                <input type="text" class="centering form-control form-fill" id="player2">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col col-form-label-md col-form-label">Team 2</label>
-                            <div class="col-5">
-                                <input type="text" class="form-control form-fill" id="player3">
+                            <label class="col col-form-label-lg text-center">Team 2</label>
+                            <div class="col-md-5">
+                                <input type="text" class="centering form-control form-fill" id="player3">
                             </div>
-                            <div class="col-5">
-                                <input type="text" class="form-control form-fill" id="player4">
+                            <div class="col-md-5">
+                                <input type="text" class="centering form-control form-fill" id="player4">
                             </div>
                         </div>
                     </div>
@@ -79,6 +86,30 @@
                                 <label for="endTeam2">Team 2</label>
                                 <input type="text" class="form-control form-fill marg-left" id="endTeam2">
                             </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group boxed pad">
+                        <h3>Goals</h3>
+                        <div class="form-group form-row">
+                          <div class="input-group col">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-md">Player</span>
+                            </div>
+                            <input type="text" class="form-control">
+                          </div>
+                          <div class="input-group col">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-md">Type</span>
+                            </div>
+                            <input type="text" class="form-control">
+                          </div>
+                          <div class="input-group col">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="inputGroup-sizing-md">Rating</span>
+                            </div>
+                            <input type="text" class="form-control">
+                          </div>
                         </div>
                     </div>
                     <br>

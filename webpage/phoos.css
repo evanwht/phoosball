@@ -7,14 +7,18 @@ body {
     filter: invert(0);
 }
 .undernav {
-    margin-top:  100px;
-    padding-top: 100px;
+    margin-top:  80px;
+    padding-top: 80px;
 }
 #scores {
     text-align: center;
     color: white;
 }
-.input {
+.centering {
+  margin-left: auto;
+  margin-right: auto;
+}
+.label {
     text-align: center;
 }
 .pad {
@@ -29,8 +33,10 @@ body {
 }
 .form-fill {
     width: 90%;
-    margin-top: 5px;
 }
 .marg-left {
     margin-left: 5%;
+}
+.see {
+  background-color: blue;
 }
