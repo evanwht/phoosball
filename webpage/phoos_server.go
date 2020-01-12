@@ -46,15 +46,21 @@ func fileExists(filename string) bool {
     return !info.IsDir()
 }
 
-func loadHtml(fileName string) (*Page, error) {
+func loadHtml(w http.ResponseWriter, fileName string) (*Page, error) {
   var (
     body []byte
     err error
   )
   if templateName := strings.Split(fileName, ".")[0] + "_template.html"; fileExists(templateName) {
     body, err = ioutil.ReadFile("./" + templateName)
+    if err != nil {
+      fmt.Fprintf(w, "Could not load %s", templateName)
+    }
   } else if fileExists(fileName) {
     body, err = ioutil.ReadFile("./" + fileName)
+    if err != nil {
+      fmt.Fprintf(w, "Could not load %s", fileName)
+    }
   }
   if err != nil {
     return nil, err
@@ -65,7 +71,7 @@ func loadHtml(fileName string) (*Page, error) {
 func renderTemplate(w http.ResponseWriter, p *Page) {
   err := templates.ExecuteTemplate(w, "template.html", p)
   if err != nil {
-    http.Error(w, err.Error(), http.StatusInternalServerError)
+    fmt.Fprintf(w, "Could not render html")
   }
 }
 
@@ -73,16 +79,16 @@ func defaultHandler(w http.ResponseWriter, r *http.Request) {
     title := r.URL.Path[1:]
     switch fileType := setContentType(w, title); fileType {
       case "text/html", "text/plain":
-        p, err := loadHtml(title + "_template.html")
+        p, err := loadHtml(w, title + "_template.html")
         if err != nil {
-          http.Error(w, err.Error(), http.StatusInternalServerError)
+          fmt.Fprintf(w, "Could not load html")
         } else {
           renderTemplate(w, p)
         }
       default:
         p, err := ioutil.ReadFile("./" + title)
         if err != nil {
-          http.Error(w, err.Error(), http.StatusInternalServerError)
+          fmt.Fprintf(w, "Could not load file")
         } else {
           fmt.Fprintf(w, "%s", p)
         }
