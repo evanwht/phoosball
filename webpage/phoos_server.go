@@ -52,9 +52,9 @@ func loadHtml(fileName string) (*Page, error) {
     err error
   )
   if templateName := strings.Split(fileName, ".")[0] + "_template.html"; fileExists(templateName) {
-    body, err = ioutil.ReadFile(templateName)
+    body, err = ioutil.ReadFile("./" + templateName)
   } else if fileExists(fileName) {
-    body, err = ioutil.ReadFile(fileName)
+    body, err = ioutil.ReadFile("./" + fileName)
   }
   if err != nil {
     return nil, err
@@ -80,7 +80,7 @@ func defaultHandler(w http.ResponseWriter, r *http.Request) {
           renderTemplate(w, p)
         }
       default:
-        p, err := ioutil.ReadFile(title)
+        p, err := ioutil.ReadFile("./" + title)
         if err != nil {
           http.Error(w, err.Error(), http.StatusInternalServerError)
         } else {
