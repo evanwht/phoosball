@@ -24,6 +24,13 @@ hr {
 .label {
     text-align: center;
 }
+p {
+    padding-bottom: 2px;
+}
+.underline {
+    border-bottom: 1px solid;
+    border-bottom-color: lightgray;
+}
 .pad {
     font-size: 130%;
     padding: 10px 0 20px 0;

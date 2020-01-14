@@ -4,7 +4,7 @@
         <h3>New Game</h3>
       </div>
         <form class="container boxed">
-            <div class="form-group pt-3">
+            <div class="form-group pt-3" id="choosePlayers" players='{"players":["king (Evan)", "number 2 (Tom)"]}'>
                 <h4>Starting Positions</h4>
                 <div class="row pad">
                     <div class="col-2"></div>
@@ -14,19 +14,27 @@
                 <div class="form-group row">
                     <label class="col col-form-label-lg">Team 1</label>
                     <div class="col-md-5">
-                        <input type="text" class="centering form-control form-fill" id="player1">
+                        <select class="form-control" id="player1">
+                          <option value=""></option>
+                        </select>
                     </div>
                     <div class="col-md-5">
-                        <input type="text" class="centering form-control form-fill" id="player2">
+                      <select class="form-control" id="player2">
+                        <option value=""></option>
+                      </select>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col col-form-label-lg text-center">Team 2</label>
                     <div class="col-md-5">
-                        <input type="text" class="centering form-control form-fill" id="player3">
+                      <select class="form-control" id="player3">
+                        <option value=""></option>
+                      </select>
                     </div>
                     <div class="col-md-5">
-                        <input type="text" class="centering form-control form-fill" id="player4">
+                      <select class="form-control" id="player4">
+                        <option value=""></option>
+                      </select>
                     </div>
                 </div>
             </div>
@@ -66,13 +74,17 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="inputGroup-sizing-md">Player</span>
                     </div>
-                    <input type="text" class="form-control">
+                    <select class="form-control goal-scorer">
+                      <option value=""></option>
+                    </select>
                   </div>
                   <div class="input-group col">
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="inputGroup-sizing-md">Type</span>
                     </div>
-                    <input type="text" class="form-control">
+                    <select class="form-control goal-type">
+                      <option value=""></option>
+                    </select>
                   </div>
                   <div class="input-group col">
                     <div class="input-group-prepend">
@@ -87,3 +99,4 @@
         </form>
     </div>
 </div>
+<script src="phoos.js"></script>
