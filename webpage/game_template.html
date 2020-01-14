@@ -4,7 +4,7 @@
         <h3>New Game</h3>
       </div>
         <form class="container boxed">
-            <div class="form-group pt-3" id="choosePlayers" players='{"players":["king (Evan)", "number 2 (Tom)"]}'>
+            <div class="form-group pt-3" id="choosePlayers" players='{{.Players}}'>
                 <h4>Starting Positions</h4>
                 <div class="row pad">
                     <div class="col-2"></div>
@@ -67,12 +67,12 @@
                 </div>
             </div>
             <hr>
-            <div class="form-group">
-                <h4>Goals</h4>
+            <div class="form-group" id="goal-sect" goal-types="{{.GoalTypes}}">
+                <h4 class="text-danger">Goals (not working)</h4>
                 <div class="form-group form-row">
                   <div class="input-group col">
                     <div class="input-group-prepend">
-                      <span class="input-group-text" id="inputGroup-sizing-md">Player</span>
+                      <span class="input-group-text">Player</span>
                     </div>
                     <select class="form-control goal-scorer">
                       <option value=""></option>
@@ -80,7 +80,7 @@
                   </div>
                   <div class="input-group col">
                     <div class="input-group-prepend">
-                      <span class="input-group-text" id="inputGroup-sizing-md">Type</span>
+                      <span class="input-group-text">Type</span>
                     </div>
                     <select class="form-control goal-type">
                       <option value=""></option>
@@ -88,7 +88,7 @@
                   </div>
                   <div class="input-group col">
                     <div class="input-group-prepend">
-                      <span class="input-group-text" id="inputGroup-sizing-md">Rating</span>
+                      <span class="input-group-text">Rating</span>
                     </div>
                     <input type="text" class="form-control">
                   </div>

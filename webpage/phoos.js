@@ -1,5 +1,5 @@
 var players =  JSON.parse($("#choosePlayers").attr("players"));
-console.log(players);
+var goal_types =  JSON.parse($("#goal-sect").attr("goal-types"));
 
 var option = function(text) {
   return '<option value="' + text + '">' + text + '</option>';
@@ -21,7 +21,10 @@ var updatePlayers = function() {
   }
 }
 
-players.players.forEach(function(player, index) {
+goal_types.forEach(function(type, index) {
+  $(".goal-type").append(option(type));
+});
+players.forEach(function(player, index) {
   $("#player1").append(option(player));
   $("#player2").append(option(player));
   $("#player3").append(option(player));

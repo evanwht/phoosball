@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -9,11 +10,15 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-type Page struct {
-	Title string
-	Body  template.HTML
+type page struct {
+	Title     string
+	Body      template.HTML
+	Players   []string
+	GoalTypes []string
 }
 
 var templates = template.Must(template.ParseFiles("template.html"))
@@ -47,7 +52,7 @@ func fileExists(filename string) bool {
 	return !info.IsDir()
 }
 
-func loadHtml(fileName string) (*Page, error) {
+func loadHTML(fileName string) (*page, error) {
 	var (
 		body []byte
 		err  error
@@ -60,28 +65,99 @@ func loadHtml(fileName string) (*Page, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Page{Title: fileName, Body: template.HTML(body)}, nil
+	return &page{Title: fileName, Body: template.HTML(body)}, nil
 }
 
-func renderTemplate(w http.ResponseWriter, p *Page) {
+func serveTemplate(w http.ResponseWriter, p *page) {
 	err := templates.ExecuteTemplate(w, "template.html", p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-func defaultHandler(w http.ResponseWriter, r *http.Request) {
+func dbHandler(db *sql.DB, f func(*sql.DB, http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		f(db, w, r)
+	}
+}
+
+func createGameInfo(db *sql.DB) *gameInfo {
+	var (
+		id          int
+		displayName string
+		name        string
+		names       []string
+		events      []string
+	)
+	// get user info
+	rows, err := db.Query("select id, name, display_name from players;")
+	if err != nil {
+		// do nothing
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&id, &name, &displayName)
+			if err != nil {
+				displayName = ""
+			}
+			names = append(names, "\""+displayName+" ("+name+")\",")
+		}
+		names = append(names, "\"New Player\"")
+	}
+
+	// get event type info
+	rows, err = db.Query("select * from event_types;")
+	if err != nil {
+		// do nothing
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&id, &name)
+			if err == nil {
+				events = append(events, "\""+name+"\",")
+			} else {
+				// load page with error message
+			}
+		}
+		events = append(events, "\"New Type\"")
+	}
+	return &gameInfo{Players: names, GoalTypes: events}
+}
+
+type gameInfo struct {
+	Players   []string
+	GoalTypes []string
+}
+
+func renderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) template.HTML {
+	var g = createGameInfo(db)
+
+	t, err := template.ParseFiles("game_template.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	var buff bytes.Buffer
+	if err = t.Execute(&buff, g); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return template.HTML(buff.String())
+}
+
+func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[1:]
 	if len(title) == 0 {
 		title = "index"
 	}
 	switch fileType := setContentType(w, title); fileType {
 	case "text/html", "text/plain":
-		p, err := loadHtml(title + "_template.html")
+		p, err := loadHTML(title + "_template.html")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
-			renderTemplate(w, p)
+			if title == "game" {
+				p.Body = renderGamePage(db, w, r)
+			}
+			serveTemplate(w, p)
 		}
 	default:
 		p, err := ioutil.ReadFile(title)
@@ -93,7 +169,7 @@ func defaultHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func addNewPlayer(w http.ResponseWriter, r *http.Request) {
+func addNewPlayer(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	if len(r.PostForm) > 0 {
 		p, err := template.ParseFiles("account.html")
@@ -104,14 +180,22 @@ func addNewPlayer(w http.ResponseWriter, r *http.Request) {
 		if err = p.Execute(&buff, r.PostForm); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		renderTemplate(w, &Page{Title: "Account", Body: template.HTML(buff.String())})
+		serveTemplate(w, &page{Title: "Account", Body: template.HTML(buff.String())})
 	}
 }
 
 func main() {
-	http.HandleFunc("/", defaultHandler)
-	http.HandleFunc("/save_player", addNewPlayer)
-	// http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
-	// http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
+	p, err := ioutil.ReadFile("../db_conn.txt")
+	if err != nil {
+		panic(err)
+	}
+	db, err := sql.Open("mysql", strings.TrimSuffix(string(p), "\n"))
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	http.HandleFunc("/", dbHandler(db, defaultHandler))
+	http.HandleFunc("/save_player", dbHandler(db, addNewPlayer))
 	log.Fatal(http.ListenAndServe(":3032", nil))
 }
