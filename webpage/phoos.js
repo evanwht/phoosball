@@ -24,6 +24,7 @@ var updatePlayers = function() {
 goal_types.forEach(function(type, index) {
   $(".goal-type").append(option(type));
 });
+
 players.forEach(function(player, index) {
   $("#player1").append(option(player));
   $("#player2").append(option(player));

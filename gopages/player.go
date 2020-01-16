@@ -13,7 +13,7 @@ import (
 func AddNewPlayer(db *sql.DB, w http.ResponseWriter, r *http.Request) *util.Page {
 	r.ParseForm()
 	if len(r.PostForm) > 0 {
-		p, err := template.ParseFiles("webpage/account.html")
+		p, err := template.ParseFiles("webpage/account_template.html")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}

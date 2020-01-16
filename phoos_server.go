@@ -41,13 +41,15 @@ func serveTemplate(w http.ResponseWriter, p *util.Page) {
 }
 
 func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
-	title := "webpage" + r.URL.Path
-	if len(title) == 0 {
-		title = "index"
+	var title string
+	if r.URL.Path == "/" {
+		title = "webpage/index"
+	} else {
+		title = "webpage" + r.URL.Path
 	}
 	switch fileType := util.SetContentType(w, title); fileType {
 	case "text/html", "text/plain":
-		p, err := loadHTML(title + "_template.html")
+		p, err := loadHTML(title)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
@@ -69,9 +71,9 @@ func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func defaultHandler(f func(*sql.DB, http.ResponseWriter, *http.Request)) {
-// 	serveTemplate(w, f())
-// }
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "webpage/favicon/favicon.ico")
+}
 
 func main() {
 	p, err := ioutil.ReadFile("db_conn.txt")
@@ -85,6 +87,6 @@ func main() {
 	defer db.Close()
 
 	http.HandleFunc("/", util.DbHandler(db, defaultHandler))
-	// http.HandleFunc("/save_player", util.DbHandler(db, booty(gopages.AddNewPlayer)))
+	http.HandleFunc("/favicon.ico", faviconHandler)
 	log.Fatal(http.ListenAndServe(":3032", nil))
 }
