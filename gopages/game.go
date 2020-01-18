@@ -51,13 +51,25 @@ func createGameInfo(db *sql.DB) *gameInfo {
 }
 
 type gameInfo struct {
-	Players   []string
-	GoalTypes []string
+	Players      []string
+	GoalTypes    []string
+	AlertMessage template.HTML
 }
 
 // RenderGamePage : renders the game input form page with correct data
 func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
-	var g = createGameInfo(db)
+	r.ParseForm()
+	var AlertMessage template.HTML
+	if len(r.PostForm) > 0 {
+		// User has submitted a previous game page data. try to insert in to db or return error message
+		// TODO insert into db
+		if (1 == 1) {
+			AlertMessage = template.HTML("<div class=\"alert alert-success\" role=\"alert\"><h4 class=\"alert-heading\">Well done!</h4><p>Aww yeah, you successfully read this important alert message.</p><hr><p class=\"mb-0\">Whenever you need to, be sure to use margin utilities to keep things nice and tidy.</p></div>")
+		}
+	}
+
+	g := createGameInfo(db)
+	g.AlertMessage = AlertMessage
 
 	t, err := template.ParseFiles("webpage/game_template.html")
 	if err != nil {
