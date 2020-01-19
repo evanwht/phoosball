@@ -40,6 +40,34 @@ func serveTemplate(w http.ResponseWriter, p *util.Page) {
 	}
 }
 
+func playerHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "text/html")
+	p, err := loadHTML("webpage/game_input/game_template.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		p.Body, err = gopages.RenderGamePage(db, w, r)
+		if err != nil {
+			return
+		}
+		serveTemplate(w, p)
+	}
+}
+
+func gameHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "text/html")
+	p, err := loadHTML("webpage/game_input/game_template.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		p.Body, err = gopages.RenderGamePage(db, w, r)
+		if err != nil {
+			return
+		}
+		serveTemplate(w, p)
+	}
+}
+
 func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	var title string
 	if r.URL.Path == "/" {
@@ -53,12 +81,6 @@ func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
-			if title == "webpage/game" {
-				p.Body, err = gopages.RenderGamePage(db, w, r)
-				if err != nil {
-					return
-				}
-			}
 			serveTemplate(w, p)
 		}
 	default:
@@ -87,6 +109,7 @@ func main() {
 	defer db.Close()
 
 	http.HandleFunc("/", util.DbHandler(db, defaultHandler))
+	http.HandleFunc("/game", util.DbHandler(db, gameHandler))
 	http.HandleFunc("/favicon.ico", faviconHandler)
 	log.Fatal(http.ListenAndServe(":3032", nil))
 }

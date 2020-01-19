@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"html/template"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -61,10 +62,17 @@ func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templat
 	r.ParseForm()
 	var AlertMessage template.HTML
 	if len(r.PostForm) > 0 {
-		// User has submitted a previous game page data. try to insert in to db or return error message
-		// TODO insert into db
-		if (1 == 1) {
-			AlertMessage = template.HTML("<div class=\"alert alert-success\" role=\"alert\"><h4 class=\"alert-heading\">Well done!</h4><p>Aww yeah, you successfully read this important alert message.</p><hr><p class=\"mb-0\">Whenever you need to, be sure to use margin utilities to keep things nice and tidy.</p></div>")
+		// User has submitted a game page data. try to insert in to db or return error message
+		b, err := ioutil.ReadFile("webpage/game_input/success_alert.html")
+		if err == nil {
+			AlertMessage = template.HTML(string(b))
+		} else {
+			b, err = ioutil.ReadFile("webpage/game_input/fail_alert.html")
+			if err == nil {
+				AlertMessage = template.HTML(string(b))
+			} else {
+				AlertMessage = template.HTML("<div><p class=\"text-danger\">Unknown failure to save game. Contanct admin</p></div>")
+			}
 		}
 	}
 
