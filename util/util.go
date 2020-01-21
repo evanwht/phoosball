@@ -53,3 +53,8 @@ func FileExists(filename string) bool {
 	}
 	return !info.IsDir()
 }
+
+// HTMLOption : wraps the id and text in an html option tag
+func HTMLOption(id string, text string) string {
+	return "<option value=\"" + id + "\">" + text + "</opton>"
+}

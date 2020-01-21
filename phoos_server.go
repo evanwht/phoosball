@@ -42,6 +42,7 @@ func serveTemplate(w http.ResponseWriter, p *util.Page) {
 
 func playerHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
+	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
 	p, err := loadHTML("webpage/game_input/game_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -56,6 +57,7 @@ func playerHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 func gameHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
+	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
 	p, err := loadHTML("webpage/game_input/game_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -75,6 +77,7 @@ func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	} else {
 		title = "webpage" + r.URL.Path
 	}
+	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
 	switch fileType := util.SetContentType(w, title); fileType {
 	case "text/html", "text/plain":
 		p, err := loadHTML(title)

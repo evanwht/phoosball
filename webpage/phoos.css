@@ -50,3 +50,9 @@ p {
 .see {
   background-color: blue;
 }
+.invalid {
+    border-color: red;
+    border-style: solid;
+    border-width: 2px;
+    /* border-radius: 10px; */
+}
