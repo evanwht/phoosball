@@ -40,7 +40,7 @@ func serveTemplate(w http.ResponseWriter, p *util.Page) {
 	}
 }
 
-func playerHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func gameHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
 	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
 	p, err := loadHTML("webpage/game_input/game_template.html")
@@ -55,19 +55,14 @@ func playerHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func gameHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func gamesHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
 	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
-	p, err := loadHTML("webpage/game_input/game_template.html")
+	body, err := gopages.RenderGamesPage(db, w, r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		p.Body, err = gopages.RenderGamePage(db, w, r)
-		if err != nil {
-			return
-		}
-		serveTemplate(w, p)
+		return
 	}
+	serveTemplate(w, &util.Page{Title: "Games", Body: body})
 }
 
 func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
@@ -113,6 +108,7 @@ func main() {
 
 	http.HandleFunc("/", util.DbHandler(db, defaultHandler))
 	http.HandleFunc("/game", util.DbHandler(db, gameHandler))
+	http.HandleFunc("/games", util.DbHandler(db, gamesHandler))
 	http.HandleFunc("/favicon.ico", faviconHandler)
 	log.Fatal(http.ListenAndServe(":3032", nil))
 }
