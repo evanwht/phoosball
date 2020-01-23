@@ -5,11 +5,12 @@ import (
 	"database/sql"
 	"html/template"
 	"log"
+	"strconv"
 	"net/http"
 	"strings"
 )
 
-func buildRow(date string, t1Pd string, t1Po string, t2Pd string, t2Po string, t1Half string, t2Half string, t1End string, t2End string) string {
+func buildRow(date string, t1Pd string, t1Po string, t2Pd string, t2Po string, t1Half int, t2Half int, t1End int, t2End int) string {
 	var (
 		team1Class string
 		team2Class string
@@ -26,8 +27,8 @@ func buildRow(date string, t1Pd string, t1Po string, t2Pd string, t2Po string, t
 				<th scope="row">` + date + `</th>
 				<td class="text-` + team1Class + `">` + t1Pd + " - " + t1Po + `</td>
 				<td class="text-` + team2Class + `">` + t2Pd + " - " + t2Po + `</td>
-				<td>` + t1Half + " - " + t2Half + `</td>
-				<td>` + t1End + " - " + t2End + `</td>
+				<td>` + strconv.Itoa(t1Half) + " - " + strconv.Itoa(t2Half) + `</td>
+				<td>` + strconv.Itoa(t1End) + " - " + strconv.Itoa(t2End) + `</td>
 				<td><button type="button"class="btn btn-outline-warning">Edit</button></td>
 			</tr>`
 }
@@ -39,10 +40,10 @@ func getGames(db *sql.DB) *gamesInfo {
 		t1Po      string
 		t2Pd      string
 		t2Po      string
-		t1Half    string
-		t2Half    string
-		t1End     string
-		t2End     string
+		t1Half    int
+		t2Half    int
+		t1End     int
+		t2End     int
 		tableRows []string
 	)
 	rows, err := db.Query("select * from last_games;")
@@ -67,7 +68,7 @@ type gamesInfo struct {
 	Games template.HTML
 }
 
-// RenderPage : gets data from db to show last 10 games played
+// RenderGamesPage : gets data from db to show last 10 games played
 func RenderGamesPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
 	t, err := template.ParseFiles("webpage/games_template.html")
 	if err != nil {
