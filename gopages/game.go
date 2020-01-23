@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"html/template"
 	"io/ioutil"
+	"strconv"
 	"log"
 	"net/http"
 	"strings"
@@ -90,10 +91,28 @@ func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templat
 				log.Println(err)
 				fail = true
 			}
-			res, err := stmt.Exec(r.PostFormValue("t1_p1"), r.PostFormValue("t1_p2"),
-				r.PostFormValue("t2_p1"), r.PostFormValue("t2_p2"),
-				r.PostFormValue("t1_half"), r.PostFormValue("t2_half"),
-				r.PostFormValue("t1_final"), r.PostFormValue("t2_final"))
+			t1Final, err := strconv.Atoi(r.PostFormValue("t1_final"))
+			if err != nil {
+				log.Println(err)
+				fail = true
+			}
+			t2Final, err := strconv.Atoi(r.PostFormValue("t2_final"))
+			if err != nil {
+				log.Println(err)
+				fail = true
+			}
+			var res sql.Result
+			if (t1Final > t2Final) {
+				res, err = stmt.Exec(r.PostFormValue("t1_p1"), r.PostFormValue("t1_p2"),
+					r.PostFormValue("t2_p1"), r.PostFormValue("t2_p2"),
+					r.PostFormValue("t1_half"), r.PostFormValue("t2_half"),
+					r.PostFormValue("t1_final"), r.PostFormValue("t2_final"))
+			} else {
+				res, err = stmt.Exec(r.PostFormValue("t2_p1"), r.PostFormValue("t2_p2"),
+					r.PostFormValue("t1_p1"), r.PostFormValue("t1_p2"),
+					r.PostFormValue("t2_half"), r.PostFormValue("t1_half"),
+					r.PostFormValue("t2_final"), r.PostFormValue("t1_final"))
+			}
 			if err != nil {
 				log.Println(err)
 				fail = true

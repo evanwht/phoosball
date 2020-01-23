@@ -43,6 +43,7 @@ func serveTemplate(w http.ResponseWriter, p *util.Page) {
 func gameHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
 	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
+	w.Header().Set("Content-Language", "en-US");
 	p, err := loadHTML("webpage/game_input/game_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -58,6 +59,7 @@ func gameHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 func gamesHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
 	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
+	w.Header().Set("Content-Language", "en-US");
 	body, err := gopages.RenderGamesPage(db, w, r)
 	if err != nil {
 		return
@@ -73,6 +75,7 @@ func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		title = "webpage" + r.URL.Path
 	}
 	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict");
+	w.Header().Set("Content-Language", "en-US");
 	switch fileType := util.SetContentType(w, title); fileType {
 	case "text/html", "text/plain":
 		p, err := loadHTML(title)
