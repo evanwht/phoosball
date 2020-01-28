@@ -68,7 +68,7 @@ type gameInfo struct {
 	Alert         template.HTML
 }
 
-var fallBackAlert = "<div><p class=\"text-danger\">Unknown failure to save game. Contanct admin</p></div>"
+var fallBackAlert = "<div><p class=\"text-danger\">Unknown failure. Contanct admin</p></div>"
 
 // RenderGamePage : renders the game input form page with correct data
 func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {

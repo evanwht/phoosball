@@ -18,19 +18,29 @@
           <div class="form-group form-row" id="team_1">
             <label class="col">Team 1</label>
             <div class="col-md-5 col-sm-12">
+              <div class="input-group">
+              <div class="input-group-prepend d-md-none d-block">
+                <div class="input-group-text">D</div>
+              </div>
               <select class="form-control" id="player1" name="t1_p1" required>
                 <option value=""></option>
                 {{.PlayerOptions}}
               </select>
+            </div class="input-group">
               <div class="invalid-feedback">
                 Must have all players
               </div>
             </div>
             <div class="col-md-5 col-sm-12">
+              <div class="input-group">
+                <div class="input-group-prepend d-md-none d-block">
+                  <div class="input-group-text">O</div>
+                </div>
               <select class="form-control" id="player2" name="t1_p2" required>
                 <option value=""></option>
                 {{.PlayerOptions}}
               </select>
+              </div>
               <div class="invalid-feedback">
                 Must have all players
               </div>
@@ -39,19 +49,29 @@
           <div class="form-group form-row" id="team_2">
             <label class="col">Team 2</label>
             <div class="col-md-5">
+              <div class="input-group">
+                <div class="input-group-prepend d-md-none d-block">
+                  <div class="input-group-text">D</div>
+                </div>
               <select class="form-control" id="player3" name="t2_p1" required>
                 <option value=""></option>
                 {{.PlayerOptions}}
               </select>
+              </div>
               <div class="invalid-feedback">
                 Must have all players
               </div>
             </div>
             <div class="col-md-5">
+              <div class="input-group">
+                <div class="input-group-prepend d-md-none d-block">
+                  <div class="input-group-text">O</div>
+                </div>
               <select class="form-control" id="player4" name="t2_p2" required>
                 <option value=""></option>
                 {{.PlayerOptions}}
               </select>
+              </div>
               <div class="invalid-feedback">
                 Must have all players
               </div>
