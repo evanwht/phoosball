@@ -22,7 +22,8 @@ func loadHTML(fileName string) (*util.Page, error) {
 		body []byte
 		err  error
 	)
-	if templateName := strings.Split(fileName, ".")[0] + "_template.html"; util.FileExists(templateName) {
+	templateName := strings.Split(fileName, ".")[0] + "_template.html"
+	if util.FileExists(templateName) {
 		body, err = ioutil.ReadFile(templateName)
 	} else if util.FileExists(fileName) {
 		body, err = ioutil.ReadFile(fileName)
@@ -65,6 +66,17 @@ func gamesHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	serveTemplate(w, &util.Page{Title: "Games", Body: body})
+}
+
+func playerHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "text/html")
+	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
+	w.Header().Set("Content-Language", "en-US")
+	body, err := gopages.RenderPlayerPage(db, w, r)
+	if err != nil {
+		return
+	}
+	serveTemplate(w, &util.Page{Title: "Player", Body: body})
 }
 
 func indexHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
@@ -120,6 +132,7 @@ func main() {
 	defer db.Close()
 
 	http.HandleFunc("/", util.DbHandler(db, defaultHandler))
+	http.HandleFunc("/player", util.DbHandler(db, playerHandler))
 	http.HandleFunc("/game", util.DbHandler(db, gameHandler))
 	http.HandleFunc("/games", util.DbHandler(db, gamesHandler))
 	http.HandleFunc("/favicon.ico", faviconHandler)

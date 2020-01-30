@@ -1,6 +1,7 @@
 <div class="container" style="max-width: 970px;">
     <div class="row">
-        <div id="scores" class="col-8 mx-auto undernav">
+        <div class="col-8 mx-auto undernav text-center">
+            {{.Alert}}
             <div class="pb-4 pt-4">
                 <h3>New Player</h3>
             </div>
@@ -9,25 +10,25 @@
                 <div class="form-group col">
                     <label class="col col-form-label-lg text-left">First Name</label>
                     <div class="">
-                        <input name="firstName" type="text" class="centering form-control form-fill">
+                        <input name="firstName" type="text" class="centering form-control form-fill" required>
                     </div>
                 </div>
                 <div class="form-group col">
                     <label class="col col-form-label-lg text-left">Last Name</label>
                     <div class="">
-                        <input name="lastName" type="text" class="centering form-control form-fill">
+                        <input name="lastName" type="text" class="centering form-control form-fill" required>
                     </div>
                 </div>
                 <div class="form-group col">
                     <label class="col col-form-label-lg text-left">Knick Name</label>
                     <div class="">
-                        <input name="knickName" type="text" class="centering form-control form-fill">
+                        <input name="nickName" type="text" class="centering form-control form-fill" maxLength=16 required>
                     </div>
                 </div>
                 <div class="form-group col">
                     <label class="col col-form-label-lg text-left">Email</label>
                     <div class="">
-                        <input name="email" type="email" class="centering form-control form-fill">
+                        <input name="email" type="email" class="centering form-control form-fill" maxLength=128 required>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-lg mb-4 mt-4">Submit</button>

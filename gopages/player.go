@@ -12,7 +12,7 @@ import (
 )
 
 // AddNewPlayer : adds a new player to the database
-func AddNewPlayer(db *sql.DB, w http.ResponseWriter, r *http.Request) *util.Page {
+func getAccountPage(db *sql.DB, id int, w http.ResponseWriter, r *http.Request) *util.Page {
 	r.ParseForm()
 	if len(r.PostForm) > 0 {
 		p, err := template.ParseFiles("webpage/account_template.html")
@@ -28,6 +28,10 @@ func AddNewPlayer(db *sql.DB, w http.ResponseWriter, r *http.Request) *util.Page
 	return nil
 }
 
+type playerInfo struct {
+	Alert template.HTML
+}
+
 // RenderPlayerPage : renders the game input form page with correct data
 func RenderPlayerPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
 	r.ParseForm()
@@ -39,23 +43,25 @@ func RenderPlayerPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templ
 			log.Fatal(err)
 			fail = true
 		} else {
-			stmt, err := db.Prepare(`INSERT INTO players (name, display_name, email) VALUES (?, ?, ?);`)
+			stmt, err := tx.Prepare(`INSERT INTO players (name, display_name, email) VALUES (?, ?, ?);`)
 			if err != nil {
 				log.Println(err)
 				fail = true
-			}
-			res, err := stmt.Exec(r.PostFormValue("t1_p1"), r.PostFormValue("t1_p2"), r.PostFormValue("t2_p1"), r.PostFormValue("t2_p2"))
-			if err != nil {
-				log.Println(err)
-				fail = true
-			}
-			lastID, err := res.LastInsertId()
-			if err != nil || lastID <= 0 {
-				fail = true
-			}
-			rowCnt, err := res.RowsAffected()
-			if err != nil || rowCnt <= 0 {
-				fail = true
+			} else {
+				res, err := stmt.Exec(r.PostFormValue("firstName") + " " + r.PostFormValue("lastName"), r.PostFormValue("nickName"), r.PostFormValue("email"))
+				if err != nil {
+					log.Println(err)
+					fail = true
+				} else {
+					lastID, err := res.LastInsertId()
+					if err != nil || lastID <= 0 {
+						fail = true
+					}
+					rowCnt, err := res.RowsAffected()
+					if err != nil || rowCnt <= 0 {
+						fail = true
+					}
+				}
 			}
 			if fail {
 				tx.Rollback()
@@ -65,24 +71,23 @@ func RenderPlayerPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templ
 		}
 		// show message alert
 		if fail {
-			b, err := ioutil.ReadFile("webpage/game_input/fail_alert.html")
+			b, err := ioutil.ReadFile("webpage/player_input/fail_alert.html")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				AlertMessage =  template.HTML(fallBackAlert)
 			}
 			AlertMessage =  template.HTML(string(b))
 		}
-		b, err := ioutil.ReadFile("webpage/game_input/success_alert.html")
+		b, err := ioutil.ReadFile("webpage/player_input/success_alert.html")
 		if err != nil {
 			AlertMessage =  template.HTML(fallBackAlert)
 		}
 		AlertMessage = template.HTML(string(b))
 	}
 
-	opts := createPlayerOptions(db)
-	g := &gameInfo{PlayerOptions: opts, Alert: AlertMessage}
+	g := &playerInfo{Alert: AlertMessage}
 
-	t, err := template.ParseFiles("webpage/game_template.html")
+	t, err := template.ParseFiles("webpage/player_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err

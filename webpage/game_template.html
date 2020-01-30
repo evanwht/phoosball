@@ -84,16 +84,16 @@
           <div class="form-group form-row">
             <div class="col">
               <label for="halfScoreTeam1">Team 1</label>
-              <input type="text" class="form-control form-fill marg-left" id="halfScoreTeam1" name="t1_half" required>
+              <input type="number" class="form-control form-fill marg-left" id="halfScoreTeam1" name="t1_half" max=5 min=0 required>
               <div class="invalid-feedback">
-                Please provide half time score
+                Please provide a valid (0-5) half time score
               </div>
             </div>
             <div class="col">
               <label for="halfScoreTeam2">Team 2</label>
-              <input type="text" class="form-control form-fill marg-left" id="halfScoreTeam2" name="t2_half" required>
+              <input type="number" class="form-control form-fill marg-left" id="halfScoreTeam2" name="t2_half" max=5 min=0 required>
               <div class="invalid-feedback">
-                Please provide half time score
+                Please provide a valid (0-5) half time score
               </div>
             </div>
           </div>
@@ -103,16 +103,16 @@
           <div class="form-group form-row">
             <div class="col">
               <label for="endTeam1">Team 1</label>
-              <input type="text" class="form-control form-fill marg-left" id="endTeam1" name="t1_final" required>
+              <input type="number" class="form-control form-fill marg-left" id="endTeam1" name="t1_final" max=15 min=0 required>
               <div class="invalid-feedback">
-                Please provide ending score
+                Please provide a valid (0-15 win by 2) ending score
               </div>
             </div>
             <div class="col">
               <label for="endTeam2">Team 2</label>
-              <input type="text" class="form-control form-fill marg-left" id="endTeam2" name="t2_final" required>
+              <input type="number" class="form-control form-fill marg-left" id="endTeam2" name="t2_final" max=15 min=0 required>
               <div class="invalid-feedback">
-                Please provide ending score
+                Please provide a valid (0-15 win by 2) ending score
               </div>
             </div>
           </div>

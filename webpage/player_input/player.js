@@ -1,18 +1,3 @@
-// $("#game_input_form").addEventListener('submit', function(e) {
-//     e.preventDefault();
-//     var optionValues = [];
-
-//     $('#game_input_form option:selected').each(function() {
-//       if (optionValues.includes($(this).val())) {
-//         $(this).style.backgroundColor = "red";
-//         return false;
-//       }
-//       optionValues.push($(this).val());
-//     });
-
-//     $("#game_input_form").submit();
-// });
-
 (function() {
     'use strict';
     window.addEventListener('load', function() {
