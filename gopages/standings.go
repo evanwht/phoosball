@@ -2,25 +2,22 @@ package gopages
 
 import (
 	"bytes"
-	"fmt"
 	"database/sql"
+	"fmt"
 	"html/template"
 	"log"
-	"strconv"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
-func standingsRow(place int, name string, wins int, losses int) string {
-	// TODO change to template
-	// strconv.FormatFloat((float64(wins) / float64(wins+losses)), 'f', 0, 32)
-	perc := fmt.Sprintf("%01.2f", (float64(wins) / float64(wins+losses)))
+func standingsRow(place int, name string, wins int, losses int, perc float32) string {
 	return `<tr>
 				<th scope="row">` + strconv.Itoa(place) + `</th>
 				<td>` + name + `</td>
 				<td>` + strconv.Itoa(wins) + `</td>
 				<td>` + strconv.Itoa(losses) + `</td>
-				<td>` + perc + `</td>
+				<td>` + fmt.Sprintf("%01.2f", perc) + `</td>
 			</tr>`
 }
 
@@ -28,21 +25,22 @@ func getStandings(db *sql.DB) *standingsInfo {
 	var (
 		name      string
 		wins      int
-		losses      int
+		losses    int
+		perc      float32
 		tableRows []string
 	)
-	rows, err := db.Query("select * from overall_standings;")
+	rows, err := db.Query("select *, (wins / (wins+losses)) perc from overall_standings order by perc desc;")
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		defer rows.Close()
 		i := 1
 		for rows.Next() {
-			err := rows.Scan(&name, &wins, &losses)
+			err := rows.Scan(&name, &wins, &losses, &perc)
 			if err != nil {
 				log.Fatal(err)
 			} else {
-				tableRows = append(tableRows, standingsRow(i, name, wins, losses))
+				tableRows = append(tableRows, standingsRow(i, name, wins, losses, perc))
 				i++
 			}
 		}
