@@ -25,11 +25,15 @@ func buildRow(date string, t1Pd string, t1Po string, t2Pd string, t2Po string, t
 	// TODO change to template
 	return `<tr>
 				<th scope="row">` + date + `</th>
-				<td class="text-` + team1Class + `">` + t1Pd + " - " + t1Po + `</td>
-				<td class="text-` + team2Class + `">` + t2Pd + " - " + t2Po + `</td>
-				<td>` + strconv.Itoa(t1Half) + " - " + strconv.Itoa(t2Half) + `</td>
-				<td>` + strconv.Itoa(t1End) + " - " + strconv.Itoa(t2End) + `</td>
-				<td><button type="button"class="btn btn-outline-warning">Edit</button></td>
+				<td id="t1" class="text-` + team1Class + `">` + t1Pd + " - " + t1Po + `</td>
+				<td id="t2" class="text-` + team2Class + `">` + t2Pd + " - " + t2Po + `</td>
+				<td id="halfScores">` + strconv.Itoa(t1Half) + " - " + strconv.Itoa(t2Half) + `</td>
+				<td id="finalScores">` + strconv.Itoa(t1End) + " - " + strconv.Itoa(t2End) + `</td>
+				<td>
+					<button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#game-edit-modal" data-t1Pd="` + t1Pd + `" data-t1Po="` + t1Po + `" data-t2Pd="` + t2Pd + `" data-t2Po="` + t2Po + `" data-t1half="` + strconv.Itoa(t1Half) + `" data-t2half="` + strconv.Itoa(t2Half) + `" data-t1final="` + strconv.Itoa(t1End) + `" data-t2final="` + strconv.Itoa(t2End) + `" data-id="1">
+						Edit
+					</button>
+				</td>
 			</tr>`
 }
 
