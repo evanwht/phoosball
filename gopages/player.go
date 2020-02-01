@@ -87,7 +87,7 @@ func RenderPlayerPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templ
 
 	g := &playerInfo{Alert: AlertMessage}
 
-	t, err := template.ParseFiles("webpage/player_template.html")
+	t, err := template.ParseFiles("webpage/player_input/player_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err

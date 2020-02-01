@@ -152,7 +152,7 @@ func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templat
 	opts := createPlayerOptions(db)
 	g := &gameInfo{PlayerOptions: opts, Alert: AlertMessage}
 
-	t, err := template.ParseFiles("webpage/game_template.html")
+	t, err := template.ParseFiles("webpage/game_input/game_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
