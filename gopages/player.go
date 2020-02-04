@@ -11,6 +11,28 @@ import (
 	"github.com/evanwht1/phoosball/util"
 )
 
+// GetAllPlayers : gets all selectable players from the db
+func GetAllPlayers(db *sql.DB) []Player {
+	var players []Player
+	rows, err := db.Query("select id, name, display_name from players;")
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			var p Player
+			err := rows.Scan(&p.ID, &p.Name, &p.NickName)
+			if err != nil {
+				log.Fatal(err)
+			} else {
+				players = append(players, p)
+			}
+		}
+		rows.Close()
+	}
+	return players
+}
+
 // AddNewPlayer : adds a new player to the database
 func getAccountPage(db *sql.DB, id int, w http.ResponseWriter, r *http.Request) *util.Page {
 	r.ParseForm()

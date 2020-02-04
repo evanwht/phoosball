@@ -3,64 +3,49 @@ package gopages
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"html/template"
 	"log"
-	"strconv"
 	"net/http"
 	"strings"
 )
 
-func buildRow(date string, t1Pd string, t1Po string, t2Pd string, t2Po string, t1Half int, t2Half int, t1End int, t2End int) string {
-	var (
-		team1Class string
-		team2Class string
-	)
-	if t1End > t2End {
-		team1Class = "success"
-		team2Class = "danger"
+var gameRowTemplate = template.Must(template.ParseFiles("webpage/games_view/game_row.html"))
+
+func buildRow(gd gameData) (string, error) {
+	if gd.T1final > gd.T2final {
+		gd.Team1Class = "success"
+		gd.Team2Class = "danger"
 	} else {
-		team1Class = "danger"
-		team2Class = "success"
+		gd.Team1Class = "danger"
+		gd.Team2Class = "success"
 	}
-	// TODO change to template
-	return `<tr>
-				<th scope="row">` + date + `</th>
-				<td id="t1" class="text-` + team1Class + `">` + t1Pd + " - " + t1Po + `</td>
-				<td id="t2" class="text-` + team2Class + `">` + t2Pd + " - " + t2Po + `</td>
-				<td id="halfScores">` + strconv.Itoa(t1Half) + " - " + strconv.Itoa(t2Half) + `</td>
-				<td id="finalScores">` + strconv.Itoa(t1End) + " - " + strconv.Itoa(t2End) + `</td>
-				<td>
-					<button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#game-edit-modal" data-t1Pd="` + t1Pd + `" data-t1Po="` + t1Po + `" data-t2Pd="` + t2Pd + `" data-t2Po="` + t2Po + `" data-t1half="` + strconv.Itoa(t1Half) + `" data-t2half="` + strconv.Itoa(t2Half) + `" data-t1final="` + strconv.Itoa(t1End) + `" data-t2final="` + strconv.Itoa(t2End) + `" data-id="1">
-						Edit
-					</button>
-				</td>
-			</tr>`
+	var buff bytes.Buffer
+	if err := gameRowTemplate.Execute(&buff, gd); err != nil {
+		return "", err
+	}
+	return buff.String(), nil
 }
 
 func getGames(db *sql.DB) *gamesInfo {
-	var (
-		date       string
-		t1Pd      string
-		t1Po      string
-		t2Pd      string
-		t2Po      string
-		t1Half    int
-		t2Half    int
-		t1End     int
-		t2End     int
-		tableRows []string
-	)
+	var tableRows []string
 	rows, err := db.Query("select * from last_games;")
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		defer rows.Close()
 		for rows.Next() {
-			err := rows.Scan(&date, &t1Pd, &t1Po, &t2Pd, &t2Po, &t1Half, &t2Half, &t1End, &t2End)
+			var game gameData
+			err := rows.Scan(&game.Date, &game.T1pd, &game.T1po, &game.T2pd, &game.T2po, &game.T1half, &game.T2half, &game.T1final, &game.T2final)
+			game.Date = game.Date[:11]
 			if err != nil {
 				log.Fatal(err)
 			} else {
-				tableRows = append(tableRows, buildRow(date[:11], t1Pd, t1Po, t2Pd, t2Po, t1Half, t2Half, t1End, t2End))
+				st, err := buildRow(game)
+				if err != nil {
+					log.Fatal(err)
+				}
+				tableRows = append(tableRows, st)
 			}
 		}
 		rows.Close()
@@ -86,4 +71,21 @@ func RenderGamesPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templa
 		return template.HTML(""), err
 	}
 	return template.HTML(buff.String()), nil
+}
+
+// SaveGameEdit : saves a PUT request to alter a games data
+func SaveGameEdit(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		decoder := json.NewDecoder(r.Body)
+		var t gameData
+		err := decoder.Decode(&t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		} else {
+			// TODO create db update statement
+			log.Print(t)
+		}
+	} else {
+		http.Error(w, "NOT ALLOWED", http.StatusMethodNotAllowed)
+	}
 }

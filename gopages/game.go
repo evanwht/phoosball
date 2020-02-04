@@ -5,40 +5,30 @@ import (
 	"database/sql"
 	"html/template"
 	"io/ioutil"
-	"strconv"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/evanwht1/phoosball/util"
 )
 
-func createPlayerOptions(db *sql.DB) template.HTML {
-	var (
-		id          string
-		displayName string
-		name        string
-		options     []string
-	)
-	rows, err := db.Query("select id, name, display_name from players;")
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		defer rows.Close()
-		for rows.Next() {
-			err := rows.Scan(&id, &name, &displayName)
-			if err != nil {
-				log.Fatal(err)
-			} else {
-				options = append(options, util.HTMLOption(id, name + " (" + displayName + ")"))
-			}
-		}
-		rows.Close()
-	}
-	return template.HTML(strings.Join(options, "\n"))
+// CreatePlayerOptions : creates select options for each player in the db
+func CreatePlayerOptions(db *sql.DB) template.HTML {
+	rows := GetAllPlayers(db)
+	return template.HTML(strings.Join(playersToOptions(rows), "\n"))
 }
 
-func createGoalTypes(db *sql.DB) template.HTML {
+func playersToOptions(players []Player) []string {
+	var options []string
+	for _, player := range players {
+		options = append(options, util.HTMLOption(strconv.Itoa(player.ID), player.Name))
+	}
+	return options
+}
+
+// CreateGoalOptions : creates select options for each goal type in the db
+func CreateGoalOptions(db *sql.DB) template.HTML {
 	var (
 		id     string
 		name   string
@@ -101,7 +91,7 @@ func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templat
 						fail = true
 					} else {
 						var res sql.Result
-						if (t1Final > t2Final) {
+						if t1Final > t2Final {
 							res, err = stmt.Exec(r.PostFormValue("t1_p1"), r.PostFormValue("t1_p2"),
 								r.PostFormValue("t2_p1"), r.PostFormValue("t2_p2"),
 								r.PostFormValue("t1_half"), r.PostFormValue("t2_half"),
@@ -138,18 +128,18 @@ func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templat
 			b, err := ioutil.ReadFile("webpage/game_input/fail_alert.html")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-				AlertMessage =  template.HTML(fallBackAlert)
+				AlertMessage = template.HTML(fallBackAlert)
 			}
-			AlertMessage =  template.HTML(string(b))
+			AlertMessage = template.HTML(string(b))
 		}
 		b, err := ioutil.ReadFile("webpage/game_input/success_alert.html")
 		if err != nil {
-			AlertMessage =  template.HTML(fallBackAlert)
+			AlertMessage = template.HTML(fallBackAlert)
 		}
 		AlertMessage = template.HTML(string(b))
 	}
 
-	opts := createPlayerOptions(db)
+	opts := CreatePlayerOptions(db)
 	g := &gameInfo{PlayerOptions: opts, Alert: AlertMessage}
 
 	t, err := template.ParseFiles("webpage/game_input/game_template.html")

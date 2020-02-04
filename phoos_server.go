@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"encoding/json"
 
 	"github.com/evanwht1/phoosball/gopages"
 	"github.com/evanwht1/phoosball/util"
@@ -79,6 +80,18 @@ func playerHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	serveTemplate(w, &util.Page{Title: "Player", Body: body})
 }
 
+func playersHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "text/html")
+	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
+	w.Header().Set("Content-Language", "en-US")
+	body := gopages.GetAllPlayers(db)
+	b, err := json.Marshal(body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Fprint(w, string(b))
+}
+
 func indexHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
 	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
@@ -133,8 +146,10 @@ func main() {
 
 	http.HandleFunc("/", util.DbHandler(db, defaultHandler))
 	http.HandleFunc("/player", util.DbHandler(db, playerHandler))
+	http.HandleFunc("/players", util.DbHandler(db, playersHandler))
 	http.HandleFunc("/game", util.DbHandler(db, gameHandler))
 	http.HandleFunc("/games", util.DbHandler(db, gamesHandler))
+	http.HandleFunc("/edit_game", util.DbHandler(db, gopages.SaveGameEdit))
 	http.HandleFunc("/favicon.ico", faviconHandler)
 	log.Fatal(http.ListenAndServe(":3032", nil))
 }
