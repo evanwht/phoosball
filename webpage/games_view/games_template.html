@@ -19,16 +19,24 @@
 <div class="modal fade" id="game-edit-modal" data-backdrop="static" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content text-center">
-      <div class="modal-header">
+      <!-- <div class="modal-header">
         <h5 class="modal-title" id="game-edit-modal-title">Edit Game</h5>
+        
+      </div> -->
+      <div class="modal-body">
         <button type="button" class="close" data-dismiss="modal">
           <span style="color:white;">&times;</span>
         </button>
-      </div>
-      <div class="modal-body">
         <form class="container" method="POST" id="game_input_form">
           <div class="form-group pt-3" id="choosePlayers">
-            <h4>Starting Positions</h4>
+            <div id='saved-alert' class="alert alert-success w-75 mx-auto" role="alert">
+              <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <p id="alert-message">Game Saved!</p>
+            </div>
+            <h4>Edit Game</h4>
+            <hr>
             <div class="d-md-block d-sm-none d-none">
               <div class="row pad">
                 <div class="col-2"></div>
@@ -90,11 +98,13 @@
             <div class="form-group form-row">
               <div class="col">
                 <label for="halfScoreTeam1">Team 1</label>
-                <input type="number" class="form-control form-fill marg-left edit-field" id="halfScoreTeam1" name="t1_half">
+                <input type="number" class="form-control form-fill marg-left edit-field" id="halfScoreTeam1"
+                  name="t1_half">
               </div>
               <div class="col">
                 <label for="halfScoreTeam2">Team 2</label>
-                <input type="number" class="form-control form-fill marg-left edit-field" id="halfScoreTeam2" name="t2_half">
+                <input type="number" class="form-control form-fill marg-left edit-field" id="halfScoreTeam2"
+                  name="t2_half">
               </div>
             </div>
           </div>

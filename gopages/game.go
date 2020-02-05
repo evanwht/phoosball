@@ -122,6 +122,7 @@ func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templat
 			} else {
 				tx.Commit()
 			}
+			stmt.Close()
 		}
 		// show message alert
 		if fail {

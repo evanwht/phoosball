@@ -90,6 +90,7 @@ func RenderPlayerPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templ
 			} else {
 				tx.Commit()
 			}
+			stmt.Close()
 		}
 		// show message alert
 		if fail {

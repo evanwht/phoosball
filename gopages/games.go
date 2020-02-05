@@ -2,6 +2,7 @@ package gopages
 
 import (
 	"bytes"
+	"fmt"
 	"database/sql"
 	"encoding/json"
 	"html/template"
@@ -29,14 +30,14 @@ func buildRow(gd gameData) (string, error) {
 
 func getGames(db *sql.DB) *gamesInfo {
 	var tableRows []string
-	rows, err := db.Query("select * from last_games;")
+	rows, err := db.Query("select id, game_date, team_1_Defense, team_1_Offense, team_2_Defense, team_2_Offense, team_1_half, team_2_half, team_1_final, team_2_final from last_games;")
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		defer rows.Close()
 		for rows.Next() {
 			var game gameData
-			err := rows.Scan(&game.Date, &game.T1pd, &game.T1po, &game.T2pd, &game.T2po, &game.T1half, &game.T2half, &game.T1final, &game.T2final)
+			err := rows.Scan(&game.ID, &game.Date, &game.T1pd, &game.T1po, &game.T2pd, &game.T2po, &game.T1half, &game.T2half, &game.T1final, &game.T2final)
 			game.Date = game.Date[:11]
 			if err != nil {
 				log.Fatal(err)
@@ -59,7 +60,7 @@ type gamesInfo struct {
 
 // RenderGamesPage : gets data from db to show last 10 games played
 func RenderGamesPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
-	t, err := template.ParseFiles("webpage/games_template.html")
+	t, err := template.ParseFiles("webpage/games_view/games_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
@@ -75,15 +76,51 @@ func RenderGamesPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templa
 
 // SaveGameEdit : saves a PUT request to alter a games data
 func SaveGameEdit(db *sql.DB, w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if r.Method == "PUT" {
 		decoder := json.NewDecoder(r.Body)
 		var t gameData
 		err := decoder.Decode(&t)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
-			// TODO create db update statement
-			log.Print(t)
+			tx, err := db.Begin()
+			var fail bool
+			if err != nil {
+				log.Fatal(err)
+				fail = true
+			} else {
+				stmt, err := tx.Prepare(`UPDATE games SET
+									team_1_p1 = ?, team_1_p2 = ?, team_2_p1 = ?, team_2_p2 = ?,
+									team_1_half = ?, team_2_half = ?, team_1_final = ?, team_2_final = ? 
+									WHERE id = ?;`)
+				if err != nil {
+					log.Println(err)
+					fail = true
+				} else {
+					var res sql.Result
+					if t.T1final > t.T2final {
+						res, err = stmt.Exec(t.T1pd, t.T1po, t.T2pd, t.T2po, t.T1half, t.T2half, t.T1final, t.T2final, t.ID)
+					} else {
+						res, err = stmt.Exec(t.T2pd, t.T2po, t.T1pd, t.T1po, t.T2half, t.T1half, t.T2final, t.T1final, t.ID)
+					}
+					if err != nil {
+						log.Println(err)
+						fail = true
+					}
+					rowCnt, err := res.RowsAffected()
+					if err != nil || rowCnt != 1 {
+						fail = true
+					}
+				}
+				if fail {
+					tx.Rollback()
+					http.Error(w, "Error", http.StatusInternalServerError)
+				} else {
+					tx.Commit()
+					fmt.Fprint(w, "Saved")
+				}
+				stmt.Close()
+			}
 		}
 	} else {
 		http.Error(w, "NOT ALLOWED", http.StatusMethodNotAllowed)
