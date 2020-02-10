@@ -138,22 +138,22 @@ func main() {
 
 	r := mux.NewRouter()
 	
-	r.HandleFunc("/players", util.Chain(env, playersHandler, util.Headers())).Methods("GET")
+	r.HandleFunc("/players", util.Chain(env, playersHandler, util.Methods("GET"), util.Headers()))
 	
 	player := r.PathPrefix("/player").Subrouter()
-	player.PathPrefix("/edit").Methods("PUT").Handler(util.Chain(env, playerHandler, util.Headers()))
-	player.Methods("GET", "POST").Handler(util.Chain(env, playerHandler, util.Headers()))
+	player.PathPrefix("/edit").Handler(util.Chain(env, playerHandler, util.Methods("PUT"), util.Headers()))
+	player.Handle("", util.Chain(env, playerHandler, util.Methods("GET", "POST"), util.Headers()))
 
-	
 	r.HandleFunc("/games", util.Chain(env, gamesHandler, util.Headers())).Methods("GET")
 
 	game := r.PathPrefix("/game").Subrouter()
-	game.Methods("GET", "POST").Handler(util.Chain(env, gameHandler, util.Headers()))
-	game.PathPrefix("/edit").Methods("PUT").Handler(util.Chain(env, gopages.SaveGameEdit, util.Headers()))
-
+	game.Handle("", util.Chain(env, gameHandler, util.Methods("GET", "POST"), util.Headers()))
+	game.PathPrefix("/edit").Handler(util.Chain(env, gopages.SaveGameEdit, util.Methods("PUT"), util.Headers()))
 
 	r.HandleFunc("/favicon.ico", faviconHandler)
 
+	// requests for other paths with incorrect methods will get here and try to render something instead
+	// of failing in their correct handler. Short coming of Gorilla IMO
 	r.PathPrefix("/").Handler(util.Chain(env, defaultHandler, util.Headers()))
 
 	log.Fatal(http.ListenAndServe(":3032", r))

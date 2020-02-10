@@ -38,6 +38,26 @@ func Headers() Middleware {
 	}
 }
 
+// Methods : writes common headers to all routes
+func Methods(methods ...string) Middleware {
+	return func(rf RouteFunc) RouteFunc {
+		return func(env *Env, w http.ResponseWriter, r *http.Request) {
+			// This is one example of how go is idiotic. "It is trivial to write your own contains method"
+			// If it is trivial, why doesn't the language just provide it since you don't give support
+			// for generics, thus making EVERY SINGLE PERSON write the same lines of code to see if an
+			// array of {type} contains a specific value. Writers of go are egotistical ass holes
+			for _, m := range methods {
+				if r.Method == m {
+					rf(env, w, r)
+					return
+				}
+			}
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+	}
+}
+
 // DBRoute : wraps a function handler from net/http with Env parameters
 func DBRoute(env *Env, rf RouteFunc) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
