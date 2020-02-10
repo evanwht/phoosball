@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -15,6 +16,7 @@ import (
 	"github.com/gorilla/mux"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var templates = template.Must(template.ParseFiles("webpage/template.html"))
@@ -124,22 +126,53 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "webpage/favicon/favicon.ico")
 }
 
+func executeSQLFile(db *sql.DB, file string) {
+	query, err := ioutil.ReadFile(file)
+	if err != nil {
+		panic(err)
+	}
+	if _, err := db.Exec(string(query)); err != nil {
+		panic(err)
+	}
+}
+
 func main() {
-	p, err := ioutil.ReadFile("db_conn.txt")
-	if err != nil {
-		panic(err)
+	var env *util.Env
+
+	// get command line argument for if this is in test mode
+	boolPtr := flag.Bool("debug", false, "a bool")
+	flag.Parse()
+	if *boolPtr {
+		// new in memory db
+		db, err := sql.Open("sqlite3", ":memory:")
+		// perform migrations from db folder
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+		executeSQLFile(db, "db/players.sql")
+		executeSQLFile(db, "db/games.sql")
+		executeSQLFile(db, "db/event_types.sql")
+		executeSQLFile(db, "db/game_events.sql")
+		executeSQLFile(db, "db/views.sql")
+		env = &util.Env{DB: db}
+	} else {
+		p, err := ioutil.ReadFile("db_conn.txt")
+		if err != nil {
+			panic(err)
+		}
+		db, err := sql.Open("mysql", strings.TrimSuffix(string(p), "\n"))
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+		env = &util.Env{DB: db}
 	}
-	db, err := sql.Open("mysql", strings.TrimSuffix(string(p), "\n"))
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	env := &util.Env{DB: db}
 
 	r := mux.NewRouter()
-	
+
 	r.HandleFunc("/players", util.Chain(env, playersHandler, util.Methods("GET"), util.Headers()))
-	
+
 	player := r.PathPrefix("/player").Subrouter()
 	player.PathPrefix("/edit").Handler(util.Chain(env, playerHandler, util.Methods("PUT"), util.Headers()))
 	player.Handle("", util.Chain(env, playerHandler, util.Methods("GET", "POST"), util.Headers()))
