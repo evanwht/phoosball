@@ -2,16 +2,17 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
-	"encoding/json"
 
 	"github.com/evanwht1/phoosball/gopages"
 	"github.com/evanwht1/phoosball/util"
+	"github.com/gorilla/mux"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -42,15 +43,13 @@ func serveTemplate(w http.ResponseWriter, p *util.Page) {
 	}
 }
 
-func gameHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func gameHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
-	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
-	w.Header().Set("Content-Language", "en-US")
 	p, err := loadHTML("webpage/game_input/game_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		p.Body, err = gopages.RenderGamePage(db, w, r)
+		p.Body, err = gopages.RenderGamePage(env.DB, w, r)
 		if err != nil {
 			return
 		}
@@ -58,33 +57,27 @@ func gameHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func gamesHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func gamesHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
-	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
-	w.Header().Set("Content-Language", "en-US")
-	body, err := gopages.RenderGamesPage(db, w, r)
+	body, err := gopages.RenderGamesPage(env.DB, w, r)
 	if err != nil {
 		return
 	}
 	serveTemplate(w, &util.Page{Title: "Games", Body: body})
 }
 
-func playerHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func playerHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
-	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
-	w.Header().Set("Content-Language", "en-US")
-	body, err := gopages.RenderPlayerPage(db, w, r)
+	body, err := gopages.RenderPlayerPage(env.DB, w, r)
 	if err != nil {
 		return
 	}
 	serveTemplate(w, &util.Page{Title: "Player", Body: body})
 }
 
-func playersHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func playersHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
-	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
-	w.Header().Set("Content-Language", "en-US")
-	body := gopages.GetAllPlayers(db)
+	body := gopages.GetAllPlayers(env.DB)
 	b, err := json.Marshal(body)
 	if err != nil {
 		log.Fatal(err)
@@ -92,25 +85,21 @@ func playersHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(b))
 }
 
-func indexHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func indexHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
-	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
-	w.Header().Set("Content-Language", "en-US")
-	body, err := gopages.RenderStandingsPage(db, w, r)
+	body, err := gopages.RenderStandingsPage(env.DB, w, r)
 	if err != nil {
 		return
 	}
 	serveTemplate(w, &util.Page{Title: "Standings", Body: body})
 }
 
-func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func defaultHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/" {
-		indexHandler(db, w, r)
+		indexHandler(env, w, r)
 		return
 	}
 	title := "webpage" + r.URL.Path
-	w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
-	w.Header().Set("Content-Language", "en-US")
 	switch fileType := util.SetContentType(w, title); fileType {
 	case "text/html", "text/plain":
 		p, err := loadHTML(title)
@@ -119,6 +108,7 @@ func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		} else {
 			serveTemplate(w, p)
 		}
+		break
 	default:
 		p, err := ioutil.ReadFile(title)
 		if err != nil {
@@ -126,6 +116,7 @@ func defaultHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		} else {
 			fmt.Fprintf(w, "%s", p)
 		}
+		break
 	}
 }
 
@@ -143,13 +134,27 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
+	env := &util.Env{DB: db}
 
-	http.HandleFunc("/", util.DbHandler(db, defaultHandler))
-	http.HandleFunc("/player", util.DbHandler(db, playerHandler))
-	http.HandleFunc("/players", util.DbHandler(db, playersHandler))
-	http.HandleFunc("/game", util.DbHandler(db, gameHandler))
-	http.HandleFunc("/games", util.DbHandler(db, gamesHandler))
-	http.HandleFunc("/edit_game", util.DbHandler(db, gopages.SaveGameEdit))
-	http.HandleFunc("/favicon.ico", faviconHandler)
-	log.Fatal(http.ListenAndServe(":3032", nil))
+	r := mux.NewRouter()
+	
+	r.HandleFunc("/players", util.Chain(env, playersHandler, util.Headers())).Methods("GET")
+	
+	player := r.PathPrefix("/player").Subrouter()
+	player.PathPrefix("/edit").Methods("PUT").Handler(util.Chain(env, playerHandler, util.Headers()))
+	player.Methods("GET", "POST").Handler(util.Chain(env, playerHandler, util.Headers()))
+
+	
+	r.HandleFunc("/games", util.Chain(env, gamesHandler, util.Headers())).Methods("GET")
+
+	game := r.PathPrefix("/game").Subrouter()
+	game.Methods("GET", "POST").Handler(util.Chain(env, gameHandler, util.Headers()))
+	game.PathPrefix("/edit").Methods("PUT").Handler(util.Chain(env, gopages.SaveGameEdit, util.Headers()))
+
+
+	r.HandleFunc("/favicon.ico", faviconHandler)
+
+	r.PathPrefix("/").Handler(util.Chain(env, defaultHandler, util.Headers()))
+
+	log.Fatal(http.ListenAndServe(":3032", r))
 }

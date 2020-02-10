@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"github.com/evanwht1/phoosball/util"
 )
 
 var gameRowTemplate = template.Must(template.ParseFiles("webpage/games_view/game_row.html"))
@@ -75,7 +76,7 @@ func RenderGamesPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (templa
 }
 
 // SaveGameEdit : saves a PUT request to alter a games data
-func SaveGameEdit(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func SaveGameEdit(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "PUT" {
 		decoder := json.NewDecoder(r.Body)
 		var t gameData
@@ -83,7 +84,7 @@ func SaveGameEdit(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
-			tx, err := db.Begin()
+			tx, err := env.DB.Begin()
 			var fail bool
 			if err != nil {
 				log.Fatal(err)

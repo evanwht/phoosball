@@ -16,10 +16,42 @@ type Page struct {
 	GoalTypes []string
 }
 
-// DbHandler : wraps a function handler from net/http with a sql.DB parameter
-func DbHandler(db *sql.DB, f func(*sql.DB, http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
+// Env : envorionment variables that should be shared between routes but created ony once
+type Env struct {
+	DB *sql.DB
+}
+
+// Middleware : does this to request before route function
+type Middleware func(RouteFunc) RouteFunc
+
+// RouteFunc :
+type RouteFunc func(*Env, http.ResponseWriter, *http.Request)
+
+// Headers : writes common headers to all routes
+func Headers() Middleware {
+	return func(rf RouteFunc) RouteFunc {
+		return func(env *Env, w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
+			w.Header().Set("Content-Language", "en-US")
+			rf(env, w, r)
+		}
+	}
+}
+
+// DBRoute : wraps a function handler from net/http with Env parameters
+func DBRoute(env *Env, rf RouteFunc) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		f(db, w, r)
+		rf(env, w, r)
+	}
+}
+
+// Chain applies middlewares to a http.HandlerFunc
+func Chain(env *Env, f RouteFunc, middlewares ...Middleware) http.HandlerFunc {
+	for _, m := range middlewares {
+		f = m(f)
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		f(env, w, r)
 	}
 }
 
@@ -33,6 +65,9 @@ func SetContentType(w http.ResponseWriter, title string) string {
 	case "svg":
 		w.Header().Set("content-type", "image/svg+xml")
 		return "image/svg+xml"
+	case "png":
+		w.Header().Set("content-type", "image/png")
+		return "image/png"
 	case "jpg":
 		w.Header().Set("content-type", "image/jpg")
 		return "image/jpg"
