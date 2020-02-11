@@ -8,6 +8,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/evanwht1/phoosball/gopages"
@@ -127,13 +130,34 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "webpage/favicon/favicon.ico")
 }
 
-func executeSQLFile(db *sqlx.DB, file string) {
-	query, err := ioutil.ReadFile(file)
+var r = regexp.MustCompile("[.]V([0-9]+)[.]sql")
+
+func executeSQLFiles(db *sqlx.DB) {
+	files, err := ioutil.ReadDir("db/test")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	if _, err := db.Exec(string(query)); err != nil {
-		panic(err)
+	var sqlFiles []string
+	for _, file := range files {
+		if !file.IsDir() && r.MatchString(file.Name()) {
+			sqlFiles = append(sqlFiles, file.Name())
+		}
+	}
+	sort.Slice(sqlFiles, func(i, j int) bool {
+		ind, _ := strconv.Atoi(r.FindStringSubmatch(sqlFiles[i])[1])
+		jnd, _ := strconv.Atoi(r.FindStringSubmatch(sqlFiles[j])[1])
+		return ind < jnd
+	})
+
+	for _, file := range sqlFiles {
+		fmt.Printf("opening %s\n", file)
+		query, err := ioutil.ReadFile("db/test/" + file)
+		if err != nil {
+			panic(err)
+		}
+		if _, err := db.Exec(string(query)); err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -141,22 +165,17 @@ func main() {
 	var env *util.Env
 
 	// get command line argument for if this is in test mode
-	boolPtr := flag.Bool("debug", false, "a bool")
+	boolPtr := flag.Bool("debug", false, "inits a sqlite db in memory for local testing")
 	flag.Parse()
 	if *boolPtr {
 		// new in memory db
 		db, err := sqlx.Open("sqlite3", ":memory:")
-		// perform migrations from db folder
 		if err != nil {
 			panic(err)
 		}
 		db.Mapper = reflectx.NewMapperFunc("json", strings.ToLower)
 		defer db.Close()
-		executeSQLFile(db, "db/players.sql")
-		executeSQLFile(db, "db/games.sql")
-		executeSQLFile(db, "db/event_types.sql")
-		executeSQLFile(db, "db/game_events.sql")
-		executeSQLFile(db, "db/views.sql")
+		executeSQLFiles(db)
 		env = &util.Env{DB: db}
 	} else {
 		p, err := ioutil.ReadFile("db_conn.txt")

@@ -16,7 +16,7 @@
     </tbody>
   </table>
 </div>
-<div class="modal fade" id="game-edit-modal" data-backdrop="static" tabindex="-1" role="dialog">
+<div class="modal fade" id="game-edit-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content text-center">
       <!-- <div class="modal-header">
@@ -29,12 +29,7 @@
         </button>
         <form class="container" method="POST" id="game_input_form">
           <div class="form-group pt-3" id="choosePlayers">
-            <div id='saved-alert' class="alert alert-success w-75 mx-auto" role="alert">
-              <button type="button" class="close" data-dismiss="alert">
-                <span aria-hidden="true">&times;</span>
-              </button>
-              <p id="alert-message">Game Saved!</p>
-            </div>
+            
             <h4>Edit Game</h4>
             <hr>
             <div class="d-md-block d-sm-none d-none">
@@ -52,7 +47,6 @@
                     <div class="input-group-text">D</div>
                   </div>
                   <select class="form-control edit-field player-options" id="player1" name="t1_p1">
-                    <option value="cur"></option>
                   </select>
                 </div class="input-group">
               </div>
@@ -62,7 +56,6 @@
                     <div class="input-group-text">O</div>
                   </div>
                   <select class="form-control edit-field player-options" id="player2" name="t1_p2">
-                    <option value="cur"></option>
                   </select>
                 </div>
               </div>
@@ -75,8 +68,6 @@
                     <div class="input-group-text">D</div>
                   </div>
                   <select class="form-control edit-field player-options" id="player3" name="t2_p1">
-                    <option value="cur"></option>
-
                   </select>
                 </div>
               </div>
@@ -86,7 +77,6 @@
                     <div class="input-group-text">O</div>
                   </div>
                   <select class="form-control edit-field player-options" id="player4" name="t2_p2">
-                    <option value="cur"></option>
                   </select>
                 </div>
               </div>
@@ -127,7 +117,10 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button id="save-game-edits" type="button" class="btn btn-outline-primary">Save changes</button>
       </div>
+      <div id='saved-alert' class="alert alert-success h-25" role="alert">
+        <p id="alert-message">Game Saved!</p>
+      </div>
     </div>
   </div>
 </div>
-<script src="games.js"></script>
+<script src="games_view/games.js"></script>

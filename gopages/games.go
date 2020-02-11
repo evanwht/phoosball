@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"github.com/evanwht1/phoosball/util"
 	"github.com/jmoiron/sqlx"
 	"html/template"
@@ -32,7 +31,7 @@ func buildRow(gd gameDBData) (string, error) {
 func getGames(db *sqlx.DB) *gamesInfo {
 	var tableRows []string
 	games := []gameDBData{}
-	err := db.Select(&games, "select id, DATE(game_date) as game_date, team_1_Defense, team_1_Offense, team_2_Defense, team_2_Offense, team_1_half, team_2_half, team_1_final, team_2_final from last_games;")
+	err := db.Select(&games, "select id, DATE(game_date) as game_date, team_1_d, team_1_d_id, team_1_o, team_1_o_id, team_2_d, team_2_d_id, team_2_o, team_2_o_id, team_1_half, team_2_half, team_1_final, team_2_final from last_games;")
 	if err != nil {
 		log.Fatal(err)
 	} else if len(games[0].Date) == 0 {
@@ -69,52 +68,46 @@ func RenderGamesPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (templ
 	return template.HTML(buff.String()), nil
 }
 
+type gameEditData struct {
+	ID      int
+	Date    string
+	T1pd    int
+	T1po    int
+	T2pd    int
+	T2po    int
+	T1half  int
+	T2half  int
+	T1final int
+	T2final int
+}
+
 // SaveGameEdit : saves a PUT request to alter a games data
 func SaveGameEdit(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "PUT" {
+		var t gameEditData
 		decoder := json.NewDecoder(r.Body)
-		var t gameData
 		err := decoder.Decode(&t)
 		if err != nil {
+			log.Println(err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
-			tx, err := env.DB.Begin()
-			var fail bool
-			if err != nil {
-				log.Fatal(err)
-				fail = true
+			updateGame := `UPDATE games SET
+							team_1_p1 = ?, team_1_p2 = ?, team_2_p1 = ?, team_2_p2 = ?,
+							team_1_half = ?, team_2_half = ?, team_1_final = ?, team_2_final = ? 
+							WHERE id = ?;`
+			var res sql.Result
+			if t.T1final > t.T2final {
+				res, err = env.DB.Exec(updateGame, t.T1pd, t.T1po, t.T2pd, t.T2po, t.T1half, t.T2half, t.T1final, t.T2final, t.ID)
 			} else {
-				stmt, err := tx.Prepare(`UPDATE games SET
-									team_1_p1 = ?, team_1_p2 = ?, team_2_p1 = ?, team_2_p2 = ?,
-									team_1_half = ?, team_2_half = ?, team_1_final = ?, team_2_final = ? 
-									WHERE id = ?;`)
-				if err != nil {
-					log.Println(err)
-					fail = true
-				} else {
-					var res sql.Result
-					if t.T1final > t.T2final {
-						res, err = stmt.Exec(t.T1pd, t.T1po, t.T2pd, t.T2po, t.T1half, t.T2half, t.T1final, t.T2final, t.ID)
-					} else {
-						res, err = stmt.Exec(t.T2pd, t.T2po, t.T1pd, t.T1po, t.T2half, t.T1half, t.T2final, t.T1final, t.ID)
-					}
-					if err != nil {
-						log.Println(err)
-						fail = true
-					}
-					rowCnt, err := res.RowsAffected()
-					if err != nil || rowCnt != 1 {
-						fail = true
-					}
-				}
-				if fail {
-					tx.Rollback()
-					http.Error(w, "Error", http.StatusInternalServerError)
-				} else {
-					tx.Commit()
-					fmt.Fprint(w, "Saved")
-				}
-				stmt.Close()
+				res, err = env.DB.Exec(updateGame, t.T2pd, t.T2po, t.T1pd, t.T1po, t.T2half, t.T1half, t.T2final, t.T1final, t.ID)
+			}
+			if err != nil {
+				log.Print(err)
+				http.Error(w, "SQL failed", http.StatusInternalServerError)
+			}
+			rowCnt, err := res.RowsAffected()
+			if err != nil || rowCnt != 1 {
+				http.Error(w, "Nothing updated", http.StatusInternalServerError)
 			}
 		}
 	} else {
