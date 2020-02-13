@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -14,6 +13,8 @@ import (
 	"github.com/evanwht1/phoosball/gopages"
 	"github.com/evanwht1/phoosball/util"
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx/reflectx"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-sqlite3"
@@ -126,7 +127,7 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "webpage/favicon/favicon.ico")
 }
 
-func executeSQLFile(db *sql.DB, file string) {
+func executeSQLFile(db *sqlx.DB, file string) {
 	query, err := ioutil.ReadFile(file)
 	if err != nil {
 		panic(err)
@@ -144,11 +145,12 @@ func main() {
 	flag.Parse()
 	if *boolPtr {
 		// new in memory db
-		db, err := sql.Open("sqlite3", ":memory:")
+		db, err := sqlx.Open("sqlite3", ":memory:")
 		// perform migrations from db folder
 		if err != nil {
 			panic(err)
 		}
+		db.Mapper = reflectx.NewMapperFunc("json", strings.ToLower)
 		defer db.Close()
 		executeSQLFile(db, "db/players.sql")
 		executeSQLFile(db, "db/games.sql")
@@ -161,7 +163,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		db, err := sql.Open("mysql", strings.TrimSuffix(string(p), "\n"))
+		db, err := sqlx.Open("mysql", strings.TrimSuffix(string(p), "\n"))
 		if err != nil {
 			panic(err)
 		}
