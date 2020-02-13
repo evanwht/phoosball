@@ -2,7 +2,7 @@ package gopages
 
 import (
 	"bytes"
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"html/template"
 	"net/http"
 	"log"
@@ -12,7 +12,7 @@ import (
 )
 
 // GetAllPlayers : gets all selectable players from the db
-func GetAllPlayers(db *sql.DB) []Player {
+func GetAllPlayers(db *sqlx.DB) []Player {
 	var players []Player
 	rows, err := db.Query("select id, name, display_name from players;")
 	if err != nil {
@@ -34,7 +34,7 @@ func GetAllPlayers(db *sql.DB) []Player {
 }
 
 // AddNewPlayer : adds a new player to the database
-func getAccountPage(db *sql.DB, id int, w http.ResponseWriter, r *http.Request) *util.Page {
+func getAccountPage(db *sqlx.DB, id int, w http.ResponseWriter, r *http.Request) *util.Page {
 	r.ParseForm()
 	if len(r.PostForm) > 0 {
 		p, err := template.ParseFiles("webpage/account_template.html")
@@ -55,7 +55,7 @@ type playerInfo struct {
 }
 
 // RenderPlayerPage : renders the game input form page with correct data
-func RenderPlayerPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+func RenderPlayerPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
 	r.ParseForm()
 	var AlertMessage template.HTML
 	if len(r.PostForm) > 0 {

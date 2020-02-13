@@ -1,7 +1,7 @@
 package util
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"html/template"
 	"net/http"
 	"os"
@@ -18,7 +18,7 @@ type Page struct {
 
 // Env : envorionment variables that should be shared between routes but created ony once
 type Env struct {
-	DB *sql.DB
+	DB *sqlx.DB
 }
 
 // Middleware : does this to request before route function
@@ -32,7 +32,7 @@ func Headers() Middleware {
 	return func(rf RouteFunc) RouteFunc {
 		return func(env *Env, w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
-			w.Header().Set("Content-Language", "en-US")
+			w.Header().Set("Content-Language", "en")
 			rf(env, w, r)
 		}
 	}

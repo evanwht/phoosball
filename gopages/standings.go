@@ -2,7 +2,7 @@ package gopages
 
 import (
 	"bytes"
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"fmt"
 	"html/template"
 	"log"
@@ -21,7 +21,7 @@ func standingsRow(place int, name string, wins int, losses int, perc float32) st
 			</tr>`
 }
 
-func getStandings(db *sql.DB) *standingsInfo {
+func getStandings(db *sqlx.DB) *standingsInfo {
 	var (
 		name      string
 		wins      int
@@ -54,7 +54,7 @@ type standingsInfo struct {
 }
 
 // RenderStandingsPage : gets data from db to show current standings of known players
-func RenderStandingsPage(db *sql.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+func RenderStandingsPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
 	t, err := template.ParseFiles("webpage/index_template.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -9,12 +9,13 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/evanwht1/phoosball/util"
 )
 
 // CreatePlayerOptions : creates select options for each player in the db
-func CreatePlayerOptions(db *sql.DB) template.HTML {
+func CreatePlayerOptions(db *sqlx.DB) template.HTML {
 	rows := GetAllPlayers(db)
 	return template.HTML(strings.Join(playersToOptions(rows), "\n"))
 }
@@ -28,7 +29,7 @@ func playersToOptions(players []Player) []string {
 }
 
 // CreateGoalOptions : creates select options for each goal type in the db
-func CreateGoalOptions(db *sql.DB) template.HTML {
+func CreateGoalOptions(db *sqlx.DB) template.HTML {
 	var (
 		id     string
 		name   string
@@ -61,7 +62,7 @@ type gameInfo struct {
 var fallBackAlert = "<div><p class=\"text-danger\">Unknown failure. Contanct admin</p></div>"
 
 // RenderGamePage : renders the game input form page with correct data
-func RenderGamePage(db *sql.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+func RenderGamePage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
 	r.ParseForm()
 	var AlertMessage template.HTML
 	if len(r.PostForm) > 0 {
