@@ -23,7 +23,7 @@ func CreatePlayerOptions(db *sqlx.DB) template.HTML {
 func playersToOptions(players []Player) []string {
 	var options []string
 	for _, player := range players {
-		options = append(options, util.HTMLOption(strconv.Itoa(player.ID), player.Name))
+		options = append(options, util.HTMLOption(strconv.Itoa(player.ID), player.Name + "(" + player.NickName + ")"))
 	}
 	return options
 }

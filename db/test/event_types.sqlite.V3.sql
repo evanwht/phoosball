@@ -1,9 +1,9 @@
-CREATE TABLE event_types (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name CHAR(64) NOT NULL
+CREATE TABLE `event_types` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` CHAR(64) NOT NULL
 );
 
-INSERT INTO event_types (id, name) VALUES
+INSERT INTO `event_types` (`id`, `name`) VALUES
 (1, 'bread'),
 (2, 'reverse bread'),
 (3, 'toast'),

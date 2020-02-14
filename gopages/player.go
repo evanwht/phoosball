@@ -4,31 +4,23 @@ import (
 	"bytes"
 	"github.com/jmoiron/sqlx"
 	"html/template"
-	"net/http"
-	"log"
 	"io/ioutil"
+	"log"
+	"net/http"
 
 	"github.com/evanwht1/phoosball/util"
 )
 
 // GetAllPlayers : gets all selectable players from the db
 func GetAllPlayers(db *sqlx.DB) []Player {
-	var players []Player
-	rows, err := db.Query("select id, name, display_name from players;")
+	players := []Player{}
+	err := db.Select(&players, "select id, name, display_name from players;")
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		defer rows.Close()
-		for rows.Next() {
-			var p Player
-			err := rows.Scan(&p.ID, &p.Name, &p.NickName)
-			if err != nil {
-				log.Fatal(err)
-			} else {
-				players = append(players, p)
-			}
+		for _, player := range players {
+			players = append(players, player)
 		}
-		rows.Close()
 	}
 	return players
 }
@@ -70,7 +62,7 @@ func RenderPlayerPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (temp
 				log.Println(err)
 				fail = true
 			} else {
-				res, err := stmt.Exec(r.PostFormValue("firstName") + " " + r.PostFormValue("lastName"), r.PostFormValue("nickName"), r.PostFormValue("email"))
+				res, err := stmt.Exec(r.PostFormValue("firstName")+" "+r.PostFormValue("lastName"), r.PostFormValue("nickName"), r.PostFormValue("email"))
 				if err != nil {
 					log.Println(err)
 					fail = true
@@ -97,13 +89,13 @@ func RenderPlayerPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (temp
 			b, err := ioutil.ReadFile("webpage/player_input/fail_alert.html")
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-				AlertMessage =  template.HTML(fallBackAlert)
+				AlertMessage = template.HTML(fallBackAlert)
 			}
-			AlertMessage =  template.HTML(string(b))
+			AlertMessage = template.HTML(string(b))
 		}
 		b, err := ioutil.ReadFile("webpage/player_input/success_alert.html")
 		if err != nil {
-			AlertMessage =  template.HTML(fallBackAlert)
+			AlertMessage = template.HTML(fallBackAlert)
 		}
 		AlertMessage = template.HTML(string(b))
 	}

@@ -26,11 +26,9 @@ function fillInOptions(button, options) {
 $('#game-edit-modal').on('show.bs.modal', function (event) {
     $.getJSON("players", function (data) {
         var items = [];
-        console.log(data)
         $.each(data, function (id, val) {
-            items.push("<option id='" + val.ID + "'>" + val.Name + "</option>");
+            items.push("<option value='" + val.id + "'>" + val.name + " (" + val.display_name + ")</option>");
         });
-        console.log(items)
         fillInOptions($(event.relatedTarget), items)
     });
 });
@@ -50,11 +48,11 @@ $('.edit-field').on("change", function (e) {
 // Should only be called from the modal Save button.
 function getGameJson() {
     var json = {
-        ID: $('#game_input_form').attr('game-id'),
-        T1pd: $('#player1').val(),
-        T1po: $('#player2').val(),
-        T2pd: $('#player3').val(),
-        T2po: $('#player4').val(),
+        ID: parseInt($('#game_input_form').attr('game-id')),
+        T1pd: parseInt($('#player1').val()),
+        T1po: parseInt($('#player2').val()),
+        T2pd: parseInt($('#player3').val()),
+        T2po: parseInt($('#player4').val()),
         T1half: parseInt($('#halfScoreTeam1').val()),
         T2half: parseInt($('#halfScoreTeam2').val()),
         T1final: parseInt($('#endTeam1').val()),
@@ -74,17 +72,22 @@ $('#save-game-edits').on("click", function (e) {
             // check if the request is done and returned a OK response
             if (this.readyState == 4) {
                 if (this.status == 200) {
-                    $('#alert-message').text('Game Saved!');
                     $('#saved-alert').show();
-                    $('#game-edit-modal').attr('dirty', 1)
+                    $('#saved-alert').delay(2000).slideUp(300, function() {
+                        $('#saved-alert').alert('close');
+                    });
+                    // TODO set cur values to new ones that were saved
+                    $('#game-edit-modal').attr('dirty', 1);
                 } else {
-                    $('#alert-message').text('Error Saving Game.');
                     $('#saved-alert').removeClass('alert-success').addClass('alert-danger').show();
+                    $('#saved-alert').delay(2000).slideUp(300, function() {
+                        $('#saved-alert').alert('close');
+                    });
                 }
             }
         };
-        xhttp.open("PUT", "edit_game", true)
-        // xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.open("PUT", "game/edit", true)
+        xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send(getGameJson());
     } else if ($(this).hasClass('btn-success')) {
         $('#game-edit-modal').modal('hide');
@@ -95,7 +98,6 @@ $('#game-edit-modal').on('hide.bs.modal', function (e) {
     if ($(this).attr('dirty') == 1) {
         location.reload();
     }
-    $('#saved-alert').hide();
 });
 
 $(document).ready(function() {
