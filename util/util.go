@@ -113,3 +113,13 @@ func FileExists(filename string) bool {
 func HTMLOption(id string, text string) string {
 	return "<option value=\"" + id + "\">" + text + "</opton>"
 }
+
+// Contains : checks if a string is contained in an array of string
+func Contains(arr []string, str string) bool {
+	for _, s := range arr {
+		if (s == str) {
+			return true
+		}
+	}
+	return false;
+}
