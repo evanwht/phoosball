@@ -1,6 +1,6 @@
-DROP VIEW IF EXISTS last_games;
+USE `phoosball`;
 
-CREATE VIEW last_games AS 
+CREATE OR REPLACE VIEW last_games AS 
 SELECT
     `g`.`id` AS `id`,
     `g`.`game_date` AS `game_date`,

@@ -1,9 +1,5 @@
 USE `phoosball`;
 
---
--- Temporary table structure for view `last_games`
---
-
 CREATE OR REPLACE VIEW `last_games` AS
 select
   `g`.`id` AS `id`,
@@ -34,10 +30,6 @@ where
 order by
   `g`.`game_date` desc;
 
---
--- Temporary table structure for view `losses`
---
-
 CREATE OR REPLACE VIEW `losses` AS
 select
   `p`.`id` AS `id`,
@@ -45,28 +37,38 @@ select
   count(0) AS `losses`
 from (
     `phoosball`.`players` `p`
-    join (
-        select
-          `g`.`id` AS `id`,
-          `g`.`team_2_p1` AS `l1`,
-          `g`.`team_2_p2` AS `l2`
-        from `phoosball`.`games` `g`
-        where
-          `g`.`game_date` > cast(current_timestamp() as date) + interval -14 day
-      ) `l` on(
-        `p`.`id` = `l`.`l1`
-        or `p`.`id` = `l`.`l2`
+    inner join `phoosball`.`games` `g`
+    on (
+        `p`.`id` = `g`.`team_2_p1`
+        or `p`.`id` = `g`.`team_2_p2`
       )
   )
 where
-  `p`.`name` is not null
+  `g`.`game_date` > cast(current_timestamp() as date) + interval -14 day
+  and `p`.`name` is not null
 group by
   `p`.`id`,
   `p`.`name`;
 
---
--- Temporary table structure for view `overall_standings`
---
+
+CREATE OR REPLACE VIEW `wins` AS
+select
+  `p`.`id` AS `id`,
+  `p`.`name` AS `name`,
+  count(0) AS `wins`
+from (
+    `phoosball`.`players` `p`
+    inner join `phoosball`.`games` `g` on (
+        `p`.`id` = `g`.`team_1_p1`
+        or `p`.`id` = `g`.`team_1_p2`
+    )
+  )
+where
+  `g`.`game_date` > cast(current_timestamp() as date) + interval -14 day
+  and `p`.`name` is not null
+group by
+  `p`.`id`,
+  `p`.`name`;
 
 CREATE OR REPLACE VIEW `overall_standings` AS (
 select
@@ -92,33 +94,3 @@ union
 order by
   `wins` desc,
   `losses`;
-
---
--- Table structure for table `players`
---
-
-CREATE OR REPLACE VIEW `wins` AS
-select
-  `p`.`id` AS `id`,
-  `p`.`name` AS `name`,
-  count(0) AS `wins`
-from (
-    `phoosball`.`players` `p`
-    join (
-        select
-          `g`.`id` AS `id`,
-          `g`.`team_1_p1` AS `w1`,
-          `g`.`team_1_p2` AS `w2`
-        from `phoosball`.`games` `g`
-        where
-          `g`.`game_date` > cast(current_timestamp() as date) + interval -14 day
-      ) `w` on(
-        `p`.`id` = `w`.`w1`
-        or `p`.`id` = `w`.`w2`
-      )
-  )
-where
-  `p`.`name` is not null
-group by
-  `p`.`id`,
-  `p`.`name`;
