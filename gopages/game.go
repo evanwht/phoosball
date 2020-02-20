@@ -3,13 +3,13 @@ package gopages
 import (
 	"bytes"
 	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/jmoiron/sqlx"
 
 	"github.com/evanwht1/phoosball/util"
 )
@@ -23,7 +23,7 @@ func CreatePlayerOptions(db *sqlx.DB) template.HTML {
 func playersToOptions(players []Player) []string {
 	var options []string
 	for _, player := range players {
-		options = append(options, util.HTMLOption(strconv.Itoa(player.ID), player.Name + "(" + player.NickName + ")"))
+		options = append(options, util.HTMLOption(strconv.Itoa(player.ID), player.Name+" ("+player.NickName+")"))
 	}
 	return options
 }
@@ -123,22 +123,21 @@ func RenderGamePage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (templa
 			} else {
 				tx.Commit()
 			}
-			stmt.Close()
 		}
 		// show message alert
 		if fail {
 			b, err := ioutil.ReadFile("webpage/game_input/fail_alert.html")
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				AlertMessage = template.HTML(fallBackAlert)
+			}
+			AlertMessage = template.HTML(string(b))
+		} else {
+			b, err := ioutil.ReadFile("webpage/game_input/success_alert.html")
+			if err != nil {
 				AlertMessage = template.HTML(fallBackAlert)
 			}
 			AlertMessage = template.HTML(string(b))
 		}
-		b, err := ioutil.ReadFile("webpage/game_input/success_alert.html")
-		if err != nil {
-			AlertMessage = template.HTML(fallBackAlert)
-		}
-		AlertMessage = template.HTML(string(b))
 	}
 
 	opts := CreatePlayerOptions(db)

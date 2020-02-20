@@ -17,10 +17,6 @@ func GetAllPlayers(db *sqlx.DB) []Player {
 	err := db.Select(&players, "select id, name, display_name from players;")
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		for _, player := range players {
-			players = append(players, player)
-		}
 	}
 	return players
 }
@@ -82,22 +78,21 @@ func RenderPlayerPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (temp
 			} else {
 				tx.Commit()
 			}
-			stmt.Close()
 		}
 		// show message alert
 		if fail {
 			b, err := ioutil.ReadFile("webpage/player_input/fail_alert.html")
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				AlertMessage = template.HTML(fallBackAlert)
+			}
+			AlertMessage = template.HTML(string(b))
+		} else {
+			b, err := ioutil.ReadFile("webpage/player_input/success_alert.html")
+			if err != nil {
 				AlertMessage = template.HTML(fallBackAlert)
 			}
 			AlertMessage = template.HTML(string(b))
 		}
-		b, err := ioutil.ReadFile("webpage/player_input/success_alert.html")
-		if err != nil {
-			AlertMessage = template.HTML(fallBackAlert)
-		}
-		AlertMessage = template.HTML(string(b))
 	}
 
 	g := &playerInfo{Alert: AlertMessage}
