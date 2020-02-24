@@ -2,8 +2,8 @@ package gopages
 
 import (
 	"bytes"
-	"github.com/jmoiron/sqlx"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"html/template"
 	"log"
 	"net/http"
@@ -11,40 +11,33 @@ import (
 	"strings"
 )
 
-func standingsRow(place int, name string, wins int, losses int, perc float32) string {
+func standingsRow(place int, cur standing) string {
 	return `<tr>
 				<th scope="row">` + strconv.Itoa(place) + `</th>
-				<td>` + name + `</td>
-				<td>` + strconv.Itoa(wins) + `</td>
-				<td>` + strconv.Itoa(losses) + `</td>
-				<td>` + fmt.Sprintf("%01.2f", perc) + `</td>
+				<td>` + cur.Name + `</td>
+				<td>` + strconv.Itoa(cur.Wins) + `</td>
+				<td>` + strconv.Itoa(cur.Losses) + `</td>
+				<td>` + fmt.Sprintf("%01.2f", cur.Perc) + `</td>
 			</tr>`
 }
 
+type standing struct {
+	Name   string
+	Wins   int
+	Losses int
+	Perc   float32
+}
+
 func getStandings(db *sqlx.DB) *standingsInfo {
-	var (
-		name      string
-		wins      int
-		losses    int
-		perc      float32
-		tableRows []string
-	)
-	rows, err := db.Query("select *, (wins / (wins+losses)) perc from overall_standings order by perc desc;")
+	var tableRows []string
+	standings := []standing{}
+	err := db.Select(&standings, "select *, (wins / (wins+losses)) perc from overall_standings order by perc desc;")
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		defer rows.Close()
-		i := 1
-		for rows.Next() {
-			err := rows.Scan(&name, &wins, &losses, &perc)
-			if err != nil {
-				log.Fatal(err)
-			} else {
-				tableRows = append(tableRows, standingsRow(i, name, wins, losses, perc))
-				i++
-			}
+		for i, standing := range standings {
+			tableRows = append(tableRows, standingsRow(i, standing))
 		}
-		rows.Close()
 	}
 	return &standingsInfo{Standings: template.HTML(strings.Join(tableRows, "\n"))}
 }

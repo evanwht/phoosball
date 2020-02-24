@@ -48,36 +48,14 @@ func RenderPlayerPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (temp
 	var AlertMessage template.HTML
 	if len(r.PostForm) > 0 {
 		fail := false
-		tx, err := db.Begin()
+		insertSQL := `INSERT INTO players (name, display_name, email) VALUES (?, ?, ?);`
+		res, err := db.Exec(insertSQL, r.PostFormValue("firstName")+" "+r.PostFormValue("lastName"), r.PostFormValue("nickName"), r.PostFormValue("email"))
 		if err != nil {
-			log.Fatal(err)
 			fail = true
-		} else {
-			stmt, err := tx.Prepare(`INSERT INTO players (name, display_name, email) VALUES (?, ?, ?);`)
-			if err != nil {
-				log.Println(err)
-				fail = true
-			} else {
-				res, err := stmt.Exec(r.PostFormValue("firstName")+" "+r.PostFormValue("lastName"), r.PostFormValue("nickName"), r.PostFormValue("email"))
-				if err != nil {
-					log.Println(err)
-					fail = true
-				} else {
-					lastID, err := res.LastInsertId()
-					if err != nil || lastID <= 0 {
-						fail = true
-					}
-					rowCnt, err := res.RowsAffected()
-					if err != nil || rowCnt <= 0 {
-						fail = true
-					}
-				}
-			}
-			if fail {
-				tx.Rollback()
-			} else {
-				tx.Commit()
-			}
+		}
+		rowCnt, err := res.RowsAffected()
+		if err != nil || rowCnt <= 0 {
+			fail = true
 		}
 		// show message alert
 		if fail {
