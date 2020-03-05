@@ -53,16 +53,14 @@ type gamesInfo struct {
 }
 
 // RenderGamesPage : gets data from db to show last 10 games played
-func RenderGamesPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+func RenderGamesPage(db *sqlx.DB, r *http.Request) (template.HTML, error) {
 	t, err := template.ParseFiles("webpage/games_view/games_template.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
 	}
 	g := getGames(db)
 	var buff bytes.Buffer
 	if err = t.Execute(&buff, g); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
 	}
 	return template.HTML(buff.String()), nil

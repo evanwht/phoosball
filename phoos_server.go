@@ -57,30 +57,33 @@ func gameHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
-		p.Body, err = gopages.RenderGamePage(env.DB, w, r)
+		p.Body, err = gopages.RenderGamePage(env.DB, r)
 		if err != nil {
-			return
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			serveTemplate(w, p)
 		}
-		serveTemplate(w, p)
 	}
 }
 
 func gamesHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
-	body, err := gopages.RenderGamesPage(env.DB, w, r)
+	body, err := gopages.RenderGamesPage(env.DB, r)
 	if err != nil {
-		return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		serveTemplate(w, &util.Page{Title: "Games", Body: body})
 	}
-	serveTemplate(w, &util.Page{Title: "Games", Body: body})
 }
 
 func playerHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
-	body, err := gopages.RenderPlayerPage(env.DB, w, r)
+	body, err := gopages.RenderPlayerPage(env.DB, r)
 	if err != nil {
-		return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		serveTemplate(w, &util.Page{Title: "Player", Body: body})
 	}
-	serveTemplate(w, &util.Page{Title: "Player", Body: body})
 }
 
 func playersHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
@@ -88,18 +91,20 @@ func playersHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	body := gopages.GetAllPlayers(env.DB)
 	b, err := json.Marshal(body)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		fmt.Fprint(w, string(b))
 	}
-	fmt.Fprint(w, string(b))
 }
 
 func indexHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
-	body, err := gopages.RenderStandingsPage(env.DB, w, r)
+	body, err := gopages.RenderStandingsPage(env.DB, r)
 	if err != nil {
-		return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		serveTemplate(w, &util.Page{Title: "Standings", Body: body})
 	}
-	serveTemplate(w, &util.Page{Title: "Standings", Body: body})
 }
 
 func defaultHandler(env *util.Env, w http.ResponseWriter, r *http.Request) {

@@ -47,16 +47,14 @@ type standingsInfo struct {
 }
 
 // RenderStandingsPage : gets data from db to show current standings of known players
-func RenderStandingsPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+func RenderStandingsPage(db *sqlx.DB, r *http.Request) (template.HTML, error) {
 	t, err := template.ParseFiles("webpage/index_template.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
 	}
 	g := getStandings(db)
 	var buff bytes.Buffer
 	if err = t.Execute(&buff, g); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
 	}
 	return template.HTML(buff.String()), nil

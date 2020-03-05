@@ -43,7 +43,7 @@ type playerInfo struct {
 }
 
 // RenderPlayerPage : renders the game input form page with correct data
-func RenderPlayerPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+func RenderPlayerPage(db *sqlx.DB, r *http.Request) (template.HTML, error) {
 	r.ParseForm()
 	var AlertMessage template.HTML
 	if len(r.PostForm) > 0 {
@@ -77,12 +77,10 @@ func RenderPlayerPage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (temp
 
 	t, err := template.ParseFiles("webpage/player_input/player_template.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
 	}
 	var buff bytes.Buffer
 	if err = t.Execute(&buff, g); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
 	}
 	return template.HTML(buff.String()), nil
