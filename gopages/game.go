@@ -57,7 +57,7 @@ type gameInfo struct {
 var fallBackAlert = "<div><p class=\"text-danger\">Unknown failure. Contanct admin</p></div>"
 
 // RenderGamePage : renders the game input form page with correct data
-func RenderGamePage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (template.HTML, error) {
+func RenderGamePage(db *sqlx.DB, r *http.Request) (template.HTML, error) {
 	r.ParseForm()
 	var AlertMessage template.HTML
 	if len(r.PostForm) > 0 {
@@ -118,12 +118,10 @@ func RenderGamePage(db *sqlx.DB, w http.ResponseWriter, r *http.Request) (templa
 
 	t, err := template.ParseFiles("webpage/game_input/game_template.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
 	}
 	var buff bytes.Buffer
 	if err = t.Execute(&buff, g); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return template.HTML(""), err
 	}
 	return template.HTML(buff.String()), nil
