@@ -31,7 +31,7 @@ func buildRow(gd gameDBData) (string, error) {
 func getGames(db *sqlx.DB) *gamesInfo {
 	var tableRows []string
 	games := []gameDBData{}
-	err := db.Select(&games, "select id, DATE(game_date) as game_date, team_1_d, team_1_d_id, team_1_o, team_1_o_id, team_2_d, team_2_d_id, team_2_o, team_2_o_id, team_1_half, team_2_half, team_1_final, team_2_final from last_games;")
+	err := db.Select(&games, "select id, DATE(game_date) as game_date, team_1_d, team_1_d_id, team_1_o, team_1_o_id, team_2_d, team_2_d_id, team_2_o, team_2_o_id, team_1_half, team_2_half, team_1_final, team_2_final from last_games where game_date > cast(current_timestamp() as date) + interval -14 day;")
 	if err != nil {
 		log.Fatal(err)
 	} else if len(games[0].Date) == 0 {
