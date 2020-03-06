@@ -17,7 +17,7 @@ func standingsRow(place int, cur standing) string {
 				<td>` + cur.Name + `</td>
 				<td>` + strconv.Itoa(cur.Wins) + `</td>
 				<td>` + strconv.Itoa(cur.Losses) + `</td>
-				<td>` + fmt.Sprintf("%01.2f", cur.Perc) + `</td>
+				<td>` + fmt.Sprintf("%01.3f", cur.Perc) + `</td>
 			</tr>`
 }
 
