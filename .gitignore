@@ -13,6 +13,7 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-.idea/*
-db_conn.txt
+db/db_conn.txt
 .vscode/*
+
+ui/node_modules

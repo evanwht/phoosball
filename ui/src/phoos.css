@@ -1,0 +1,90 @@
+.dark {
+    background-color: #252830;
+}
+.text-hide {
+    color: #252830!important;
+}
+html {
+    background-color: #252830;
+    color: white;
+}
+.modal-content {
+    background-color: #252830;
+    color: white;
+    /* border-color: white; */
+ }
+.logo {
+    width: 45px;
+    filter: invert(0);
+}
+.undernav {
+    margin-top:  80px;
+    padding-top: 60px;
+    padding-bottom: 20px;
+}
+.winners {
+    color: green
+}
+.losers {
+    color: red;
+}
+ #scores {
+    text-align: center;
+    color: white;
+}
+.centering {
+  margin-left: auto;
+  margin-right: auto;
+}
+hr {
+  background-color: grey;
+}
+.label {
+    text-align: center;
+}
+p {
+    padding-bottom: 2px;
+}
+.underline {
+    border-bottom: 1px solid;
+    border-bottom-color: lightgray;
+}
+.pad {
+    font-size: 130%;
+    padding: 10px 0 20px 0;
+}
+.border-orange {
+    border-color: #FF9502!important;
+}
+.border-teal {
+    border-color: #02BD9C!important;
+}
+.bordered {
+    border-style: solid;
+    border-width: 1px;
+}
+.bordered-bottom {
+    border-bottom: solid;
+    border-width: 90%;
+    border-width: 1px;
+}
+.boxed {
+    border-style: solid;
+    border-width: 2px;
+    border-color: cadetblue;
+} 
+ .form-fill {
+    width: 90%;
+}
+.marg-left {
+    margin-left: 5%;
+}
+.see {
+  background-color: blue;
+}
+.invalid {
+    border-color: red;
+    border-style: solid;
+    border-width: 2px;
+    background-color: lightcoral;
+} 
