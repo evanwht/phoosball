@@ -11,6 +11,14 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// Player from the db
+type Player struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	NickName string `json:"display_name"`
+	Email    string `json:"email"`
+}
+
 // GetAllPlayers : gets all selectable players from the db
 func GetAllPlayers(db *sqlx.DB) []Player {
 	players := []Player{}

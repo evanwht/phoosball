@@ -1,0 +1,237 @@
+openapi: "3.0.3"
+
+info:
+  version: "1.0"
+  title: Phoosball API
+  license:
+    name: MIT
+
+servers:
+  - url: "https://cnvr.phoosball.space/api"
+  - url: "http://localhost:3032/api"
+
+paths:
+  /players:
+    get:
+      summary: get a list of all players
+      responses:
+        200: 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/player'
+    post:
+      summary: Create a new player
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/player'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: id of the player
+                type: integer
+                format: int32
+        5XX:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /players/{id}:
+    get:
+      summary: get a single player
+      parameters:
+        - name: id
+          in: path
+          description: id of the player
+          required: true
+          schema:
+            type: integer
+      responses:
+        200: 
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/player'
+    put:
+      description: Update player info. Can send only the fields that should be updated.
+      summary: update a player
+      parameters:
+        - name: id
+          in: path
+          description: id of the player
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/player'
+      responses:
+        200: 
+          description: OK
+    delete:
+      summary: delete a player
+      parameters:
+        - name: id
+          in: path
+          description: id of the player
+          required: true
+          schema:
+            type: integer
+      responses:
+        200: 
+          description: OK
+  /games:
+    get:
+      summary: get a list of all games
+      responses:
+        200: 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/game'
+    post:
+      summary: Create a new game
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/game'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: id of the player
+                type: integer
+                format: int32
+  /games/{id}:
+    get:
+      summary: get a single game
+      responses:
+        200: 
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/game'
+    put:
+      summary: update a game
+      description: Updates info about a game. Can include only the fields that need to be updated.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/game'
+      responses:
+        200: 
+          description: OK
+    delete:
+      summary: deletes a game
+      responses:
+        200: 
+          description: OK
+
+components:
+  schemas:
+    player:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+          format: int32
+        email:
+          type: string
+        nickname: 
+          type: string
+    team:
+      type: object
+      required:
+      - defense
+      - offense
+      properties:
+        defense:
+          description: player who started on defense
+          $ref: '#/components/schemas/player'
+        offense:
+          description: player who started on offense
+          $ref: '#/components/schemas/player'
+    game:
+      type: object
+      required:
+      - played
+      - team1
+      - team2
+      - team1Half
+      - team2Half
+      - team1Final
+      - team2Final
+      properties:
+        played:
+          type: integer
+          format: int64
+          description: epoch second the game was played
+        team1:
+          $ref: '#/components/schemas/team'
+        team2:
+          $ref: '#/components/schemas/team'
+        team1Half:
+          type: integer
+          format: int32
+        team2Half:
+          type: integer
+          format: int32
+        team1Final:
+          type: integer
+          format: int32
+        team2Final:
+          type: integer
+          format: int32
+        events:
+          type: array
+          items:
+            $ref: '#components/schemas/event'
+    event:
+      type: object
+      required:
+      - type
+      - by
+      properties:
+        type:
+          type: integer
+          format: int32
+        by:
+          $ref: '#/components/schemas/player'
+        on:
+          $ref: '#/components/schemas/player'
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+      required:
+        - code
+        - message

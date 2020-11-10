@@ -1,12 +1,5 @@
 package gopages
 
-// Player from the db
-type Player struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	NickName string `json:"display_name"`
-}
-
 type gameDBData struct {
 	ID      int    `json:"id"`
 	Date    string `json:"game_date"`
