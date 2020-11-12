@@ -1,0 +1,20 @@
+version: "3"
+services:
+  phoos-db:
+    container_name: phoos-db
+    build:
+      context: db
+      dockerfile: maria.Dockerfile
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: testing
+  phoos-server:
+    build:
+      context: .
+    command: -debug
+    ports:
+      - "3032:3032"
+    volumes:
+      - "./db:/conf"
+      - "./db/test:/db/test"

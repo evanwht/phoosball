@@ -1,0 +1,1 @@
+root:testing@(phoos-db:3306)/phoosball

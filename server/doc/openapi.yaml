@@ -29,6 +29,8 @@ paths:
         content:
           application/json:
             schema:
+              required:
+              - name
               $ref: '#/components/schemas/player'
       responses:
         200:
@@ -36,9 +38,7 @@ paths:
           content:
             application/json:
               schema:
-                description: id of the player
-                type: integer
-                format: int32
+                $ref: '#/components/schemas/player'
         5XX:
           description: Server Error
           content:
@@ -92,6 +92,35 @@ paths:
       responses:
         200: 
           description: OK
+  /standings:
+    get:
+      summary: get a list of all player's standings
+      responses:
+        200: 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/standing'
+  /stadings/{id}:
+    get:
+      summary: get a single player's standing
+      parameters:
+        - name: id
+          in: path
+          description: id of a player
+          required: true
+          schema:
+            type: integer
+      responses:
+        200: 
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/standing'
   /games:
     get:
       summary: get a list of all games
@@ -123,6 +152,13 @@ paths:
   /games/{id}:
     get:
       summary: get a single game
+      parameters:
+        - name: id
+          in: path
+          description: id of the game
+          required: true
+          schema:
+            type: integer
       responses:
         200: 
           description: OK
@@ -133,6 +169,13 @@ paths:
     put:
       summary: update a game
       description: Updates info about a game. Can include only the fields that need to be updated.
+      parameters:
+        - name: id
+          in: path
+          description: id of the game
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -143,6 +186,13 @@ paths:
           description: OK
     delete:
       summary: deletes a game
+      parameters:
+        - name: id
+          in: path
+          description: id of the game
+          required: true
+          schema:
+            type: integer
       responses:
         200: 
           description: OK
@@ -151,9 +201,6 @@ components:
   schemas:
     player:
       type: object
-      required:
-      - id
-      - name
       properties:
         name:
           type: string
@@ -224,6 +271,21 @@ components:
           $ref: '#/components/schemas/player'
         on:
           $ref: '#/components/schemas/player'
+    standing:
+      type: object
+      required:
+      - name
+      - wins
+      - losses
+      properties:
+        name:
+          type: string
+        wins:
+          type: integer
+          format: int32
+        losses:
+          type: integer
+          format: int32
     Error:
       type: object
       properties:
