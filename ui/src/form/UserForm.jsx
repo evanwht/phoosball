@@ -1,5 +1,6 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 
 const UserForm = props => {
@@ -12,9 +13,9 @@ const UserForm = props => {
     let button = null;
     if (props.submitButtonText) {
         button = (
-            <Form.Row className="pr-1 pl-1 mb-4 mt-4">
-                <Button variant="primary" type="submit" block>{submitButtonText}</Button>
-            </Form.Row>
+            <Row className="pr-1 pl-1 mb-4 mt-4">
+                <Button variant="primary" type="submit" size="lg">{submitButtonText}</Button>
+            </Row>
         );
     }
 

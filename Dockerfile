@@ -1,4 +1,4 @@
-FROM node:current-alpine AS ui
+FROM node AS ui
 
 RUN mkdir /ui
 WORKDIR /ui

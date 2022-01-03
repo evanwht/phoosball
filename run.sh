@@ -16,4 +16,4 @@ if [[ "$(docker inspect --format '{{json .State.Health.Status }}' phoos-db)" != 
     docker exec -i phoos-db mysql -h127.0.0.1 -uroot -ptesting <<< "INSERT INTO phoosball.schema_history (version, description, name, checksum) VALUES (1, 'phoosball', '1.phoosball.sql', '6bba020d7cdd9386c3c1d59d68d5de78');"
 fi
 
-docker-compose up -d phoos-server
+docker compose up -d --build phoos-server

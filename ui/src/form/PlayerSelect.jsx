@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import FormControl from 'react-bootstrap/FormControl';
+import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 import InputGroup from 'react-bootstrap/InputGroup';
 
-export class PlayerSelect extends Component {
+export default class PlayerSelect extends Component {
 
     renderPlayerOptions(players) {
         return players.map((player) => {
@@ -18,10 +18,10 @@ export class PlayerSelect extends Component {
         return (
             <Col sm="12" md="5">
                 <InputGroup>
-                    <InputGroup.Prepend className="d-md-none d-block w-25">
-                        <InputGroup.Text className="text-white">{position}</InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <FormControl
+                    {/* <InputGroup.Prepend className="d-md-none d-block w-25"> */}
+                        <InputGroup.Text className="text-black">{position}</InputGroup.Text>
+                    {/* </InputGroup.Prepend> */}
+                    <Form.Control
                         as="select"
                         name={name}
                         value={value}
@@ -30,7 +30,7 @@ export class PlayerSelect extends Component {
                     >
                         <option key="-1" value="-1"></option>
                         {this.renderPlayerOptions(this.props.players)}
-                    </FormControl>
+                    </Form.Control>
                 </InputGroup>
             </Col>
         )

@@ -17,3 +17,4 @@ db/db_conn.txt
 .vscode/*
 
 ui/node_modules
+ui/build

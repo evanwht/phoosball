@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
 import Form from 'react-bootstrap/Form';
-import FormLabel from 'react-bootstrap/FormLabel';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import API from "../api/api";
 import UserForm from "./UserForm";
 import AlertDismissable from "./AlertDismiss";
 
-export class PlayerForm extends Component {
+export default class PlayerForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -93,7 +92,7 @@ export class PlayerForm extends Component {
                         submitButtonText="Create"
                         elements={() => (
                             <React.Fragment>
-                                <FormLabel className="text-white">First Name</FormLabel>
+                                <Form.Label className="text-white">First Name</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="firstname"
@@ -101,7 +100,7 @@ export class PlayerForm extends Component {
                                     className="mb-3"
                                     onChange={this.change}
                                 />
-                                <FormLabel className="text-white">Last Name</FormLabel>
+                                <Form.Label className="text-white">Last Name</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="lastname"
@@ -109,7 +108,7 @@ export class PlayerForm extends Component {
                                     className="mb-3"
                                     onChange={this.change}
                                 />
-                                <FormLabel className="text-white">Nick Name</FormLabel>
+                                <Form.Label className="text-white">Nick Name</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="nickname"
@@ -117,7 +116,7 @@ export class PlayerForm extends Component {
                                     className="mb-3"
                                     onChange={this.change}
                                 />
-                                <FormLabel className="text-white">Email</FormLabel>
+                                <Form.Label className="text-white">Email</Form.Label>
                                 <Form.Control
                                     type="email"
                                     name="email"

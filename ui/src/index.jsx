@@ -4,11 +4,11 @@ import App from './App';
 import { StandingsTable } from './StandingsTable';
 import { GamesTable } from './GamesTable';
 import { Navigation } from './Nav';
-import { PlayerForm } from './form/PlayerForm';
-import { GameForm } from './form/GameForm';
+import PlayerForm  from './form/PlayerForm';
+import GameForm from './form/GameForm';
 import {
   HashRouter,
-  Switch,
+  Routes,
   Route
 } from "react-router-dom";
 import * as serviceWorker from './serviceWorker';
@@ -19,13 +19,13 @@ ReactDOM.render(
   <HashRouter>
     <Navigation />
     <Container className="undernav">
-      <Switch>
-        <Route path="/standings" exact component={StandingsTable} />
-        <Route path="/games" exact component={GamesTable} />
-        <Route path="/new/game" exact component={GameForm} />
-        <Route path="/new/player" exact component={PlayerForm} />
-        <Route path="/" exact component={App} />
-      </Switch>
+      <Routes>
+        <Route path="/standings" element={<StandingsTable/>} />
+        <Route path="/games" element={<GamesTable/>} />
+        <Route path="/new/game" element={<GameForm/>} />
+        <Route path="/new/player" element={<PlayerForm/>} />
+        <Route path="/" element={<App/>} />
+      </Routes>
     </Container>
   </HashRouter>,
   document.getElementById('root')

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
-import { GameEditModal } from './GameEditModal'
+import GameEditModal from './GameEditModal.jsx'
 
-export class GameEditButton extends Component {
+export default class GameEditButton extends Component {
     constructor(props) {
         super(props)
         this.showModal = this.showModal.bind(this);

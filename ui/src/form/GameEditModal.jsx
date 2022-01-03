@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Form from 'react-bootstrap/Form';
-import FormLabel from 'react-bootstrap/FormLabel';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
@@ -9,9 +8,9 @@ import Button from 'react-bootstrap/Button';
 import API from "../api/api";
 import UserForm from "./UserForm";
 import AlertDismissable from "./AlertDismiss";
-import { PlayerSelect } from "./PlayerSelect";
+import PlayerSelect from "./PlayerSelect";
 
-export class GameEditModal extends Component {
+export default class GameEditModal extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -168,9 +167,9 @@ export class GameEditModal extends Component {
                     </Row>
                 </div>
                 <Form.Group id="team-1">
-                    <Form.Row>
+                    <Row>
                         <Col sm="2">
-                            <FormLabel className="text-white">Team 1</FormLabel>
+                            <Form.Label className="text-white">Team 1</Form.Label>
                         </Col>
                         <PlayerSelect
                             value={this.state.p1}
@@ -186,12 +185,12 @@ export class GameEditModal extends Component {
                             position="Offense"
                             change={this.change}
                         />
-                    </Form.Row>
+                    </Row>
                 </Form.Group>
                 <Form.Group id="team-2">
-                    <Form.Row>
+                    <Row>
                         <Col sm="2">
-                            <FormLabel className="text-white">Team 2</FormLabel>
+                            <Form.Label className="text-white">Team 2</Form.Label>
                         </Col>
                         <PlayerSelect
                             value={this.state.p3}
@@ -207,7 +206,7 @@ export class GameEditModal extends Component {
                             position="Offense"
                             change={this.change}
                         />
-                    </Form.Row>
+                    </Row>
                 </Form.Group>
             </Form.Group>
         )
@@ -218,12 +217,12 @@ export class GameEditModal extends Component {
             <Form.Group id="scores">
                 <h4 className="pb-2 text-white text-center">Scores</h4>
                 <Form.Group>
-                    <Form.Row>
+                    <Row>
                         <Col className="pr-2">
                             <h5 className="pb-2 text-white text-center">Half</h5>
-                            <Form.Row>
+                            <Row>
                                 <Col>
-                                    <FormLabel className="text-white text-center">Team 1</FormLabel>
+                                    <Form.Label className="text-white text-center">Team 1</Form.Label>
                                     <Form.Control
                                         name="t1h"
                                         type="number"
@@ -233,11 +232,11 @@ export class GameEditModal extends Component {
                                     />
                                 </Col>
                                 <Col xs="2">
-                                    <FormLabel className="text-hide">suh</FormLabel>
+                                    <Form.Label className="text-hide">suh</Form.Label>
                                     <p className="text-white text-center">__</p>
                                 </Col>
                                 <Col>
-                                    <FormLabel className="text-white text-center">Team 2</FormLabel>
+                                    <Form.Label className="text-white text-center">Team 2</Form.Label>
                                     <Form.Control
                                         name="t2h"
                                         type="number"
@@ -246,13 +245,13 @@ export class GameEditModal extends Component {
                                         max={5} min={0} required
                                     />
                                 </Col>
-                            </Form.Row>
+                            </Row>
                         </Col>
                         <Col className="pl-2">
                             <h5 className="pb-2 text-white text-center">Final</h5>
-                            <Form.Row>
+                            <Row>
                                 <Col>
-                                    <FormLabel className="text-white text-center">Team 1</FormLabel>
+                                    <Form.Label className="text-white text-center">Team 1</Form.Label>
                                     <Form.Control
                                         name="t1f"
                                         type="number"
@@ -262,11 +261,11 @@ export class GameEditModal extends Component {
                                     />
                                 </Col>
                                 <Col xs="2">
-                                    <FormLabel className="text-hide">suh</FormLabel>
+                                    <Form.Label className="text-hide">suh</Form.Label>
                                     <p className="text-white text-center">__</p>
                                 </Col>
                                 <Col>
-                                    <FormLabel className="text-white text-center">Team 2</FormLabel>
+                                    <Form.Label className="text-white text-center">Team 2</Form.Label>
                                     <Form.Control
                                         name="t2f"
                                         type="number"
@@ -275,9 +274,9 @@ export class GameEditModal extends Component {
                                         max={15} min={0} required
                                     />
                                 </Col>
-                            </Form.Row>
+                            </Row>
                         </Col>
-                    </Form.Row>
+                    </Row>
                 </Form.Group>
             </Form.Group>
         )
@@ -302,15 +301,15 @@ export class GameEditModal extends Component {
                                 </React.Fragment>
                             )}
                         />
-                        <Form.Row className="pr-1 pl-1 mb-4 mt-4">
-                            <Col>
-                                <Button variant="secondary" onClick={this.props.onHide} block>Cancel</Button>
+                        <Row className="pr-1 pl-1 mb-4 mt-4">
+                            <Col className="d-grid gap-2">
+                                <Button variant="secondary" onClick={this.props.onHide}>Cancel</Button>
                             </Col>
-                            <Col xs="1"></Col>
-                            <Col>
-                                <Button variant={this.state.buttonVariant} onClick={this.submit} block>Save</Button>
+
+                            <Col className="d-grid gap-2">
+                                <Button variant={this.state.buttonVariant} onClick={this.submit}>Save</Button>
                             </Col>
-                        </Form.Row>
+                        </Row>
                     </Container>
 
                 </Modal.Body>

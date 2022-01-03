@@ -21,8 +21,8 @@ type Event struct {
 
 // Team : Grouping of players that represent one half of a phoosball game
 type Team struct {
-	Offense  players.Player `json:"offsense"` // player that started on offense
-	Deffense players.Player `json:"defense"`  // player that started on defense
+	Offense  players.Player `json:"offense"` // player that started on offense
+	Deffense players.Player `json:"defense"` // player that started on defense
 }
 
 // Game : data representing a game

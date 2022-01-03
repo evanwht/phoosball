@@ -7,8 +7,8 @@ export class StandingsTable extends Component {
         super(props)
         this.state = {
             standings: [
-                { id: 1, player: { name: 'Evan White' }, wins: 1, losses: 0, percentage: 1.00 },
-                { id: 2, player: { name: 'Zach Volz' }, wins: 0, losses: 1, percentage: 0.00 }
+                { id: 1, name: 'Evan White', wins: 1, losses: 0 },
+                { id: 2, name: 'Zach Volz', wins: 0, losses: 1 }
             ]
         }
     }
@@ -23,11 +23,12 @@ export class StandingsTable extends Component {
 
     renderTableData() {
         return this.state.standings.map((standing, index) => {
-            const { player, wins, losses, percentage } = standing
+            const { name, wins, losses } = standing
+            let percentage = wins/ losses
             return (
                 <tr key={index}>
                     <td className="align-middle">{index + 1}</td>
-                    <td className="align-middle">{player.name}</td>
+                    <td className="align-middle">{name}</td>
                     <td className="align-middle">{wins}</td>
                     <td className="align-middle">{losses}</td>
                     <td className="align-middle">{(Math.round(percentage * 100) / 100).toFixed(2)}</td>
