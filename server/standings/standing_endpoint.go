@@ -8,16 +8,17 @@ import (
 )
 
 // Endpoint : endpoint that returns JSON data for player standings
-type StandingsEndpoint struct {
+type StandingEndpoint struct {
 	Env *util.Env
 }
 
 // Get : get standings of all players
-func (e StandingsEndpoint) Get(r *gin.Context) {
-	var standings []Standing
-	if err := e.Env.DB.Select(&standings, "select * from overall_standings;"); err != nil {
+func (e StandingEndpoint) Get(r *gin.Context) {
+	id := r.Param("id")
+	var standing Standing
+	if err := e.Env.DB.Get(&standing, "select * from overall_standings WHERE id = ?;", id); err != nil {
 		r.Error(err)
 		return
 	}
-	r.JSON(http.StatusOK, standings)
+	r.JSON(http.StatusOK, standing)
 }
