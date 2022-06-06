@@ -3,6 +3,7 @@ module github.com/evanwht/phoosball/server
 go 1.15
 
 require (
+	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6 // indirect
 	github.com/gin-gonic/gin v1.8.0
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.0

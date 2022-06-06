@@ -10,6 +10,7 @@ import (
 	"github.com/evanwht/phoosball/server/players"
 	"github.com/evanwht/phoosball/server/standings"
 	"github.com/evanwht/phoosball/server/util"
+	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -68,5 +69,5 @@ func main() {
 
 	r.Static("static", ".")
 
-	r.Run()
+	endless.ListenAndServe("localhost:3032", r)
 }
